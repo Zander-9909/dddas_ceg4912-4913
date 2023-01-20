@@ -14,4 +14,5 @@ wheel in intervals, and will call if there is no response from the driver
 + Ryan Tong
 + Kenneth Chen
 + Leonardo Saavedra Morales
-![alt text] (https://github.com/Zander-9909/dddas_ceg4912-4913/blob/main/Initial%20Architecture.png "Initial Architecture")
+#
+![alt text](https://github.com/Zander-9909/dddas_ceg4912-4913/blob/main/Initial%20Architecture.png "Initial Architecture")
