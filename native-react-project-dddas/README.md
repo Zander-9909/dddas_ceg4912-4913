@@ -2,4 +2,9 @@
 
 This Native React project is setup with [Expo Go](https://reactnative.dev/docs/environment-setup). 
 
-To start the expo server, make sure to run 'npm install' to download all the dependencies, as they are not stored in the repo. Then simply run the command 'npx expo start'.
+To start the expo server:
+1. Run 'npm install' command after the initial clone to install dependencies.
+2. Run the command 'npx expo start'.
+3. Scan the QR Code with the Expo Go app on Android or Camera App on iOS.
+
+Note: The host device and mobile device have to be connected to the same local network. May not work at the uni's network.
