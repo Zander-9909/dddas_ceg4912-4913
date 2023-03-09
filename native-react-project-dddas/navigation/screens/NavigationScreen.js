@@ -13,7 +13,9 @@ function NavigationScreen(props) {
 const styles = StyleSheet.create({
     background: {
         flex: 1,
-        backgroundColor: '#e8bcf0'
+        backgroundColor: '#e8bcf0',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
 })
 

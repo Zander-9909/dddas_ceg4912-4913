@@ -23,15 +23,16 @@ function MainContainer() {
             <Tab.Navigator
                 initialRouteName={navigationName}
                 screenOptions={({ route }) => ({
-                    // tab bar styling
+                    // tab bar style
+                    headerShown: false,
                     tabBarActiveTintColor: 'tomato',
                     tabBarInactiveTintColor: 'grey',
-                    // tabBarLabelStyle: { paddingBottom: 10, fontSize: 10 },
-                    // tabBarStyle: { padding: , height:  },
+
                     // tab bar icon select
                     tabBarIcon: ({ focused, color, size }) => {
                         let iconName;
                         let rn = route.name;
+                        // https://ionic.io/ionicons/
                         switch (rn) {
                             case navigationName:
                                 iconName = focused ? 'home' : 'home-outline';
