@@ -1,12 +1,13 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import { StyleSheet, Text, View, SafeAreaView } from 'react-native';
 
 function LoginScreen(props) {
     return (
-        <View style={styles.background}>
-            <Text>This is the front end for the DDDAS project in Native React.</Text>
+        <SafeAreaView style={styles.background}>
+            <Text>This is the login screen for the DDDAS project</Text>
             <StatusBar style="auto" />
-        </View>
+        </SafeAreaView>
     );
 }
 
