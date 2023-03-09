@@ -1,9 +1,9 @@
-import HomeScreen from './app/screens/HomeScreen';
-import LoginScreen from './app/screens/LoginScreen';
+import React from "react";
+import MainContainer from "./navigation/MainContainer";
 
 export default function App(props) {
   return (
-    <HomeScreen/>
+    <MainContainer />
   );
 }
 

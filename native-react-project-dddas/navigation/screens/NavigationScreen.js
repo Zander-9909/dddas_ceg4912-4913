@@ -1,8 +1,8 @@
 import React from 'react';
-import { StyleSheet, Text, View, SafeAreaView } from 'react-native';
+import { StyleSheet, Text, SafeAreaView } from 'react-native';
 
 
-function HomeScreen(props) {
+function NavigationScreen(props) {
     return (
         <SafeAreaView style={styles.background}>
             <Text>This is the Home screen</Text>
@@ -17,4 +17,4 @@ const styles = StyleSheet.create({
     },
 })
 
-export default HomeScreen;
+export default NavigationScreen;

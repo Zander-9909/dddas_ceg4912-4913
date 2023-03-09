@@ -1,12 +1,10 @@
 import React from 'react';
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, SafeAreaView } from 'react-native';
+import { StyleSheet, Text, SafeAreaView } from 'react-native';
 
-function LoginScreen(props) {
+function AlertsScreen(props) {
     return (
         <SafeAreaView style={styles.background}>
-            <Text>This is the login screen for the DDDAS project</Text>
-            <StatusBar style="auto" />
+            <Text>This is the Alert screen</Text>
         </SafeAreaView>
     );
 }
@@ -20,4 +18,4 @@ const styles = StyleSheet.create({
     },
 })
 
-export default LoginScreen;
+export default AlertsScreen;
