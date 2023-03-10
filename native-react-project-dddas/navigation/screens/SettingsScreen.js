@@ -1,10 +1,22 @@
 import React from 'react';
-import { StyleSheet, Text, SafeAreaView } from 'react-native';
+import { StyleSheet, Text, SafeAreaView, Button } from 'react-native';
+
+// screens
+const loginScreenName = 'Login';
 
 function AlertsScreen(props) {
+    const { navigation } = props;
+
     return (
         <SafeAreaView style={styles.background}>
             <Text>This is the Settings screen</Text>
+
+            <Button
+                onPress={() => navigation.navigate(loginScreenName)}
+                title="Logout"
+                style={{}}
+                // accessibilityLabel="Learn more about this purple button"
+            />
         </SafeAreaView>
     );
 }

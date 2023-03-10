@@ -1,9 +1,15 @@
 import React from "react";
-import MainContainer from "./navigation/MainContainer";
+import InnerNavigator from "./navigation/InnerNavigator";
+import OuterNavigator from "./navigation/OuterNavigator";
+import { NavigationContainer } from '@react-navigation/native';
+
 
 export default function App(props) {
-  return (
-    <MainContainer />
-  );
+	return (
+		<NavigationContainer>
+			<OuterNavigator />
+		</NavigationContainer>
+
+	);
 }
 
