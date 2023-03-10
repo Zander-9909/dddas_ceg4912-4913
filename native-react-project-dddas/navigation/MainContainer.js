@@ -5,7 +5,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 
 // screens
 import NavigationScreen from './screens/NavigationScreen';
-import AlertsScreen from './screens/AlertsScreen';
+import AlertsScreen from './screens/alerts-components/AlertsScreen';
 import StatsScreen from './screens/StatsScreen';
 import SettingsScreen from './screens/SettingsScreen';
 
