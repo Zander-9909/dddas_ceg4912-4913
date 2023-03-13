@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, SafeAreaView } from 'react-native';
 
-function AlertsScreen(props) {
+function StatsScreen(props) {
     return (
         <SafeAreaView style={styles.background}>
             <Text>This is the Stats screen</Text>
@@ -18,4 +18,4 @@ const styles = StyleSheet.create({
     },
 })
 
-export default AlertsScreen;
+export default StatsScreen;

@@ -4,7 +4,7 @@ import { StyleSheet, Text, SafeAreaView, Button } from 'react-native';
 // screens
 const loginScreenName = 'Login';
 
-function AlertsScreen(props) {
+function SettingsScreen(props) {
     const { navigation } = props;
 
     return (
@@ -30,4 +30,4 @@ const styles = StyleSheet.create({
     },
 })
 
-export default AlertsScreen;
+export default SettingsScreen;
