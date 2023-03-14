@@ -3,14 +3,13 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 // screens
 import ForgotPasswordScreen from './auth-screens/ForgotPasswordScreen';
-import LoginScreen from './auth-screens/LoginScreen';
+import SigninScreen from './auth-screens/SigninScreen';
 import RegisterScreen from './auth-screens/RegisterScreen';
-import NavigationScreen from './screens/NavigationScreen';
 import InnerNavigator from './InnerNavigator';
 
 // screen names
 const forgotPasswordName = 'ForgotPassword';
-const loginScreenName = 'Login';
+const signinScreenName = 'Signin';
 const registerName = 'Register';
 const navigationName = 'Navigation';
 
@@ -20,9 +19,14 @@ function OuterNavigator() {
 	return (
 		<Stack.Navigator
 			screenOptions={{}}
-			initialRouteName={loginScreenName}>
+			initialRouteName={signinScreenName}>
 
-			<Stack.Screen name={loginScreenName} component={LoginScreen} />
+			<Stack.Screen name={signinScreenName}
+				component={SigninScreen}
+				options={{
+					headerShown: false
+				}}
+			/>
 			<Stack.Screen name={registerName} component={RegisterScreen} />
 			<Stack.Screen name={forgotPasswordName} component={ForgotPasswordScreen} />
 			<Stack.Screen

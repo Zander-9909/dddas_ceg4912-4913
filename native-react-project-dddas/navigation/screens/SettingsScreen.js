@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, SafeAreaView, Button } from 'react-native';
 
 // screens
-const loginScreenName = 'Login';
+const signinScreenName = 'Signin';
 
 function SettingsScreen(props) {
     const { navigation } = props;
@@ -12,8 +12,8 @@ function SettingsScreen(props) {
             <Text>This is the Settings screen</Text>
 
             <Button
-                onPress={() => navigation.navigate(loginScreenName)}
-                title="Logout"
+                onPress={() => navigation.navigate(signinScreenName)}
+                title='Sign out'
                 style={{}}
                 // accessibilityLabel="Learn more about this purple button"
             />
