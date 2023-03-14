@@ -1,7 +1,7 @@
 import React from 'react';
 import {
     StyleSheet, View, Text, TextInput, Button, Image, StatusBar, KeyboardAvoidingView,
-    TouchableWithoutFeedback, Keyboard
+    TouchableWithoutFeedback, Keyboard, TouchableOpacity
 } from 'react-native';
 import Logo from '../../assets/logo.png';
 
@@ -20,7 +20,7 @@ function SigninScreen(props) {
         <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={styles.container}>
-            <StatusBar backgroundColor="#FFFFFF" barStyle="dark-content" />
+            <StatusBar backgroundColor='#FFFFFF' barStyle='dark-content' />
 
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <View style={styles.inner}>
@@ -29,47 +29,50 @@ function SigninScreen(props) {
                         source={Logo}
                         resizeMode='contain'
                     />
+                    <View style={{ marginBottom: '5%' }} >
+                        <TextInput
+                            style={styles.textInput}
+                            onChangeText={onChangeUsername}
+                            value={username}
+                            placeholder='Username'
 
-                    <TextInput
-                        style={styles.textInput}
-                        onChangeText={onChangeUsername}
-                        value={username}
-                        placeholder='Username'
-                        keyboardType='default'
+                            keyboardType='default'
+                            autoCorrect={false}
+                            maxLength={20}
+                        />
 
-                        autoCorrect={false}
-                        maxLength={20}
-                    />
+                        <TextInput
+                            style={[styles.textInput, styles.textInputWithNoMarginBottom]}
+                            onChangeText={onChangePassword}
+                            value={password}
+                            placeholder='Password'
 
-                    <TextInput
-                        style={[styles.textInput, styles.textInputWithNoMarginBottom]}
-                        onChangeText={onChangePassword}
-                        value={password}
-                        placeholder='Password'
-                        keyboardType='default'
+                            keyboardType='default'
+                            secureTextEntry={true}
+                            autoCorrect={false}
+                            maxLength={20}
+                        />
 
-                        secureTextEntry={true}
-                        autoCorrect={false}
-                        maxLength={20}
-                    />
+                        <TouchableOpacity style={{ alignSelf: 'flex-end' }} onPress={() => navigation.navigate(forgotPasswordName)}>
+                            <Text style={{ fontSize: 18, color: 'blue' }}>Forgot password?</Text>
+                        </TouchableOpacity>
+                    </View>
 
-                    <Button
-                        onPress={() => navigation.navigate(forgotPasswordName)}
-                        title='Forgot Password'
-                        style={{}}
-                    />
+                    <View style={{ marginBottom: '20%' }}>
+                        <Button
+                            color='blue'
+                            onPress={() => navigation.navigate(navigationName)}
+                            title='Sign in'
+                        />
+                    </View>
 
-                    <Button
-                        onPress={() => navigation.navigate(registerName)}
-                        title='Register'
-                        style={{}}
-                    />
+                    <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+                        <Text style={{ fontSize: 18 }}>Need an account? </Text>
+                        <TouchableOpacity onPress={() => navigation.navigate(registerName)}>
+                            <Text style={{ fontSize: 18, color: 'blue' }}>Register</Text>
+                        </TouchableOpacity>
+                    </View>
 
-                    <Button
-                        onPress={() => navigation.navigate(navigationName)}
-                        title='Sign in'
-                        style={{}}
-                    />
                 </View>
             </TouchableWithoutFeedback>
         </KeyboardAvoidingView>
@@ -77,11 +80,11 @@ function SigninScreen(props) {
 }
 
 const styles = StyleSheet.create({
-    container: {
+    container: { // for keyboard-avoiding-view
         flex: 1,
         paddingTop: StatusBar.currentHeight,
     },
-    inner: {
+    inner: { // for inner view
         flex: 1,
         alignItems: 'center',
         // justifyContent: 'center',
@@ -90,15 +93,15 @@ const styles = StyleSheet.create({
         width: '40%',
         height: '40%',
     },
-    textInput: {
+    textInput: { // for username and password
         width: 200,
-        height: 40,
+        height: 35,
         borderColor: '#000000',
         borderBottomWidth: 1,
         marginBottom: 20,
     },
     textInputWithNoMarginBottom: {
-        marginBottom: 0, // Override the marginBottom property for this input
+        marginBottom: 0,
     },
 })
 
