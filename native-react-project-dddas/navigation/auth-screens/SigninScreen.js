@@ -38,6 +38,7 @@ function SigninScreen(props) {
 
                             keyboardType='default'
                             autoCorrect={false}
+                            spellCheck={false}
                             maxLength={20}
                         />
 
@@ -50,6 +51,7 @@ function SigninScreen(props) {
                             keyboardType='default'
                             secureTextEntry={true}
                             autoCorrect={false}
+                            spellCheck={false}
                             maxLength={20}
                         />
 

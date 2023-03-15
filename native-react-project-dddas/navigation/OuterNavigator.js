@@ -24,7 +24,8 @@ function OuterNavigator() {
 			<Stack.Screen name={signinScreenName}
 				component={SigninScreen}
 				options={{
-					headerShown: false
+					headerShown: false,
+					title: 'Sign in',
 				}}
 			/>
 			<Stack.Screen name={registerName} component={RegisterScreen} />
