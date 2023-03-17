@@ -1,10 +1,10 @@
 import React from 'react';
+import axios from 'axios';
 import {
     StyleSheet, View, Text, TextInput, Button, Image, StatusBar, KeyboardAvoidingView,
     TouchableWithoutFeedback, Keyboard, TouchableOpacity
 } from 'react-native';
 import Logo from '../../assets/logo.png';
-
 
 // screen names
 const forgotPasswordName = 'ForgotPassword';
@@ -15,6 +15,23 @@ function SigninScreen(props) {
     const { navigation } = props;
     const [username, onChangeUsername] = React.useState('');
     const [password, onChangePassword] = React.useState('');
+
+    const handleSignin = async (username, password) => {
+        try {
+            const response = await axios.post('http://localhost:5000/signin', { username, password });
+
+            if (response.status === 200) { // signin successful
+                navigation.navigate(navigationName);
+
+            } else { // signin failed
+                console.log('Signin failed');
+            }
+
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    };
 
     return (
         <KeyboardAvoidingView
@@ -63,7 +80,7 @@ function SigninScreen(props) {
                     <View style={{ marginBottom: '20%' }}>
                         <Button
                             color='blue'
-                            onPress={() => navigation.navigate(navigationName)}
+                            onPress={handleSignin}
                             title='Sign in'
                         />
                     </View>

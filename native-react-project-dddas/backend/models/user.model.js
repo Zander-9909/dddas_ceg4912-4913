@@ -30,7 +30,7 @@ const userSchema = new Schema({
         lowercase: true,
         validate: {
             validator: function (v) {
-                return v.length >= 6;
+                return /\S+@\S+\.\S+/.test(v);
             },
             message: props => `${props.value} is not a valid email!`
         }
@@ -42,14 +42,12 @@ const userSchema = new Schema({
         minlength: 6,
         validate: {
             validator: function (v) {
-                return /\S+@\S+\.\S+/.test(v);
+                return v.length >= 5;
             },
             message: props => `${props.value} is not a valid password!`
         }
     }
-}, {
-    timestamps: true,
-});
+}, { timestamps: true }, { collection: 'user-info' });
 
 const User = mongoose.model('User', userSchema);
 

@@ -17,7 +17,7 @@ connection.once('open', () => {
     console.log("MongoDB database connection established successfully");
 })
 
-const alertRouter = require('./routes/alerts');
+const alertRouter = require('./routes/alerts'); // add routes 
 const usersRouter = require('./routes/users');
 
 app.use('/alerts', alertRouter); // at /alerts, load alerts
