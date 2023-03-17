@@ -1,6 +1,5 @@
-import React from "react";
-import InnerNavigator from "./navigation/InnerNavigator";
-import OuterNavigator from "./navigation/OuterNavigator";
+import React from 'react';
+import OuterNavigator from './frontend/navigation/OuterNavigator.js'
 import { NavigationContainer } from '@react-navigation/native';
 
 
@@ -9,7 +8,6 @@ export default function App(props) {
 		<NavigationContainer>
 			<OuterNavigator />
 		</NavigationContainer>
-
 	);
 }
 

@@ -2,9 +2,9 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
 // screens
-import ForgotPasswordScreen from './auth-screens/ForgotPasswordScreen';
-import SigninScreen from './auth-screens/SigninScreen';
-import RegisterScreen from './auth-screens/RegisterScreen';
+import ForgotPasswordScreen from '../auth-screens/ForgotPasswordScreen';
+import SigninScreen from '../auth-screens/SigninScreen';
+import RegisterScreen from '../auth-screens/RegisterScreen';
 import InnerNavigator from './InnerNavigator';
 
 // screen names
