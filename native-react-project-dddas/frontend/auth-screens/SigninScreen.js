@@ -80,7 +80,7 @@ function SigninScreen(props) {
                     <View style={{ marginBottom: '20%' }}>
                         <Button
                             color='blue'
-                            onPress={handleSignin}
+                            onPress={() => handleSignin(username, password)}
                             title='Sign in'
                         />
                     </View>
