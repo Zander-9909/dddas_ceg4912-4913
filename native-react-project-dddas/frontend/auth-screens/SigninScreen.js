@@ -16,22 +16,27 @@ function SigninScreen(props) {
     const [username, onChangeUsername] = React.useState('');
     const [password, onChangePassword] = React.useState('');
 
-    const handleSignin = async (username, password) => {
-        try {
-            const response = await axios.post('http://localhost:5000/signin', { username, password });
-
-            if (response.status === 200) { // signin successful
-                navigation.navigate(navigationName);
-
-            } else { // signin failed
-                console.log('Signin failed');
-            }
-
-        } catch (error) {
-            console.error(error);
-            throw error;
-        }
+    const handleSignin = async (inputUsername, inputPassword) => {
+        const session_url = '/users/signin';
+        const payload = {
+            "username": inputUsername,
+            "password": inputPassword
+        };
+    
+        axios.post(session_url, payload)
+            .then(response => {
+                if (response.status === 200) { // signin successful
+                    navigation.navigate(navigationName);
+                } else { // signin failed
+                    console.log('Signin failed');
+                }
+                console.log(response);
+            })
+            .catch(error => {
+                console.log('Error', error.message);
+            });
     };
+    
 
     return (
         <KeyboardAvoidingView

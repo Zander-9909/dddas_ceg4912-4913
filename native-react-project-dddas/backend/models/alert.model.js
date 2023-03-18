@@ -10,7 +10,7 @@ const alertSchema = new Schema({
         date: { type: Date, required: true },
         isActive: { type: Boolean, default: true },
     }]
-}, { timestamps: true }, { collection: 'user-alert' });
+}, { timestamps: true }, { collection: 'alerts' });
 
 const Alert = mongoose.model('Alert', alertSchema);
 
