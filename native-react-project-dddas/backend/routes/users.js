@@ -47,7 +47,7 @@ router.route('/signin').post(async (req, res) => {
 
         const isMatch = await bcrypt.compare(password, user.password); // unhashing
         if (!isMatch) {
-            return res.status(400).json({ message: 'Incorrect password' });
+            return res.status(401).json({ message: 'Incorrect password' });
         }
 
         res.status(200).json({ message: 'Signin successful', user });
@@ -58,5 +58,10 @@ router.route('/signin').post(async (req, res) => {
     }
 });
 
+// http://localhost:5000/users/signin
+// {
+// 	"username":"boryukenneth",
+// 	"password":"dddas0"
+// }
 
 module.exports = router;

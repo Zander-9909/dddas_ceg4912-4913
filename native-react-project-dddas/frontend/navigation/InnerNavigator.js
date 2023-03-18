@@ -7,19 +7,14 @@ import NavigationScreen from '../screens/NavigationScreen';
 import AlertsScreen from '../screens/AlertsScreen';
 import StatsScreen from '../screens/StatsScreen';
 import SettingsScreen from '../screens/SettingsScreen';
-
-// screen names
-const navigationName = 'Navigation';
-const alertsName = 'Alerts';
-const statsName = 'Stats';
-const settingsName = 'Settings'
+import Global from './Global';
 
 const Tab = createBottomTabNavigator();
 
 function InnerNavigator() {
     return (
         <Tab.Navigator
-            initialRouteName={navigationName}
+            initialRouteName={Global.navigationName}
             screenOptions={({ route }) => ({
                 // tab bar style
                 headerShown: false, // hides header
@@ -32,16 +27,16 @@ function InnerNavigator() {
                     let rn = route.name;
                     // https://ionic.io/ionicons/
                     switch (rn) {
-                        case navigationName:
+                        case Global.navigationName:
                             iconName = focused ? 'home' : 'home-outline';
                             break;
-                        case alertsName:
+                        case Global.alertsName:
                             iconName = focused ? 'list' : 'list-outline';
                             break;
-                        case statsName:
+                        case Global.statsName:
                             iconName = focused ? 'stats-chart' : 'stats-chart-outline';
                             break;
-                        case settingsName:
+                        case Global.settingsName:
                             iconName = focused ? 'settings' : 'settings-outline';
                             break;
                     }
@@ -50,10 +45,10 @@ function InnerNavigator() {
                 },
             })}>
 
-            <Tab.Screen name={navigationName} component={NavigationScreen} />
-            <Tab.Screen name={alertsName} component={AlertsScreen} />
-            <Tab.Screen name={statsName} component={StatsScreen} />
-            <Tab.Screen name={settingsName} component={SettingsScreen} />
+            <Tab.Screen name={Global.navigationName} component={NavigationScreen} />
+            <Tab.Screen name={Global.alertsName} component={AlertsScreen} />
+            <Tab.Screen name={Global.statsName} component={StatsScreen} />
+            <Tab.Screen name={Global.settingsName} component={SettingsScreen} />
 
         </Tab.Navigator>
     );

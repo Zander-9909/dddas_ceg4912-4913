@@ -4,8 +4,7 @@ import {
     TextInput, Keyboard, Button, Image
 } from 'react-native';
 import Logo from '../../assets/logo.png';
-
-const signinScreenName = 'Signin';
+import Global from '../navigation/Global';
 
 function RegisterScreen(props) {
     const { navigation } = props;
@@ -94,7 +93,7 @@ function RegisterScreen(props) {
                         />
                         <Button
                             color='blue'
-                            onPress={() => navigation.navigate(signinScreenName)}
+                            onPress={() => navigation.navigate(Global.signinScreenName)}
                             title='CREATE NEW ACCOUNT'
                         />
                     </View>

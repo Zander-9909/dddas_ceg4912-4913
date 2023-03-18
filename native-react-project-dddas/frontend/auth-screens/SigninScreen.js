@@ -5,32 +5,31 @@ import {
     TouchableWithoutFeedback, Keyboard, TouchableOpacity
 } from 'react-native';
 import Logo from '../../assets/logo.png';
+import Global from '../navigation/Global';
 
 // screen names
 const forgotPasswordName = 'ForgotPassword';
 const registerName = 'Register';
-const navigationName = 'Navigation';
+const navigationName = 'Navigation_';
 
 function SigninScreen(props) {
     const { navigation } = props;
     const [username, onChangeUsername] = React.useState('');
     const [password, onChangePassword] = React.useState('');
 
-    const handleSignin = async (inputUsername, inputPassword) => {
-        const session_url = '/users/signin';
-        const payload = {
-            "username": inputUsername,
-            "password": inputPassword
-        };
+    const handleSignin = async (username, password) => {
+        const session_url = 'http://192.168.0.7:5000/users/signin';
     
-        axios.post(session_url, payload)
+        axios.post(session_url, {
+            "username": username,
+            "password": password
+        })
             .then(response => {
                 if (response.status === 200) { // signin successful
-                    navigation.navigate(navigationName);
-                } else { // signin failed
-                    console.log('Signin failed');
-                }
-                console.log(response);
+                    navigation.navigate(Global.innerName);
+                    console.log(`User ${response.data.user.username} has successfully logged in.`);
+                    // console.log(response.data.user); // logs user info from db
+                } 
             })
             .catch(error => {
                 console.log('Error', error.message);
@@ -77,7 +76,7 @@ function SigninScreen(props) {
                             maxLength={20}
                         />
 
-                        <TouchableOpacity style={{ alignSelf: 'flex-end' }} onPress={() => navigation.navigate(forgotPasswordName)}>
+                        <TouchableOpacity style={{ alignSelf: 'flex-end' }} onPress={() => navigation.navigate(Global.forgotPasswordName)}>
                             <Text style={{ fontSize: 18, color: 'blue' }}>Forgot password?</Text>
                         </TouchableOpacity>
                     </View>
@@ -92,7 +91,7 @@ function SigninScreen(props) {
 
                     <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
                         <Text style={{ fontSize: 18 }}>Need an account? </Text>
-                        <TouchableOpacity onPress={() => navigation.navigate(registerName)}>
+                        <TouchableOpacity onPress={() => navigation.navigate(Global.registerName)}>
                             <Text style={{ fontSize: 18, color: 'blue' }}>Register</Text>
                         </TouchableOpacity>
                     </View>
