@@ -1,7 +1,22 @@
-import ffmpeg
+import cv2
+import math
+from datetime import datetime
 
+camera = cv2.VideoCapture(0)#enable camera[0] as a capture device
+framerate = camera.get(5) * 0.5 #Get half the frame rate
+path = "/home/zander/CEG4912-3/dddas_ceg4912-4913/ml-python/frames/"
 
-stream = ffmpeg.input('Integrated Webcam', framerate=30,ss = 0, r = 0.5)
-stream = ffmpeg.filter(stream,'fps', fps = '1/30')
-#stream = ffmpeg.output(stream,'testSS-%d.jpg',start_number=0)
-ffmpeg.run(stream)
+while(camera.isOpened()):
+    framenum = camera.get(1) #get current frame number
+    return_value, image = camera.read()
+    if(return_value != True):
+        break;
+    if(framenum % math.floor(framerate) == 0):
+        now = datetime.now()
+
+        current_time = now.strftime("%H:%M:%S")
+
+        name = path + "/frame" + current_time+ ".png"
+        cv2.imwrite(name, image)
+        print("Captured at :" +current_time)
+del(camera)
