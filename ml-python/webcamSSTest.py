@@ -1,13 +1,21 @@
 import cv2
 import math
+import dlib
 import FacialLandmarkExtract as FLE
 from datetime import datetime
 
 camera = cv2.VideoCapture(0)#enable camera[0] as a capture device
 framerate = camera.get(5) * 0.5 #Get half the frame rate
-path = "/home/zander/CEG4912-3/dddas_ceg4912-4913/ml-python/frames/"
+path = "/Users/RyeTo/Documents/GitHub/dddas_ceg4912-4913/ml-python/frames"
+i = 0
 
-while(camera.isOpened()):
+def face(image):
+    detector = dlib.get_frontal_face_detector()
+    find = detector(image,1)
+    if ((len(find) > 0)):
+        print("Face found!")
+
+while(i < 10):
     framenum = camera.get(1) #get current frame number
     return_value, image = camera.read()
     if(return_value != True):
@@ -19,5 +27,9 @@ while(camera.isOpened()):
 
         name = path + "/frame" + current_time+ ".png"
         cv2.imwrite(name, image)
+        face(image)
         print("Captured at :" +current_time)
-del(camera)
+        i+=1
+
+camera.release()
+cv2.destroyAllWindows()
