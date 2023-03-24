@@ -1,5 +1,6 @@
 import cv2
 import math
+import FacialLandmarkExtract as FLE
 from datetime import datetime
 
 camera = cv2.VideoCapture(0)#enable camera[0] as a capture device
@@ -10,11 +11,11 @@ while(camera.isOpened()):
     framenum = camera.get(1) #get current frame number
     return_value, image = camera.read()
     if(return_value != True):
-        break;
+        break
     if(framenum % math.floor(framerate) == 0):
         now = datetime.now()
 
-        current_time = now.strftime("%H:%M:%S")
+        current_time = now.strftime("%H-%M-%S.%f")
 
         name = path + "/frame" + current_time+ ".png"
         cv2.imwrite(name, image)
