@@ -1,6 +1,7 @@
 #Using the mlxtend python library, we can take a grayscale photo and
 #extract certain facial landmarks from it, and overlay them onto the photo
 import cv2
+import math
 import FeatureMeasurement as fm
 from imutils import face_utils
 import dlib #required for mlxtend to function.
@@ -9,6 +10,7 @@ p = "shape_predictor_68_face_landmarks.dat"
 from mlxtend.image import extract_face_landmarks
 # Function to take in a photo and extract landmarks
 import os
+avEAR,avMAR, avCIR, avMOE = [],[],[],[]
 path = "/home/zander/CEG4912-3/dddas_ceg4912-4913/ml-python/frames/"
 
 faceDetector = dlib.get_frontal_face_detector() #dlib facial detector
@@ -20,12 +22,25 @@ def getLandmarks(image):
         return landmarks
     else: return "Could not detect a face"
 
+def printAveragesToFile(file):
+    file.write("Val:\tMean\t Max\t Min\n")
+    file.write("EAR:\t"+str(round(sum(avEAR)/len(avEAR),5))+"\t"+str(round(max(avEAR),5))+"\t"+str(round(min(avEAR),5))+"\n")
+    file.write("MAR:\t"+str(round(sum(avMAR)/len(avMAR),5))+"\t"+str(round(max(avMAR),5))+"\t"+str(round(min(avMAR),5))+"\n")
+    file.write("CIR:\t"+str(round(sum(avCIR)/len(avCIR),5))+"\t"+str(round(max(avCIR),5))+"\t"+str(round(min(avCIR),5))+"\n")
+    file.write("MOE:\t"+str(round(sum(avMOE)/len(avMOE),5))+"\t"+str(round(max(avMOE),5))+"\t"+str(round(min(avMOE),5))+"\n")
+
+
 def printMeasurements(shape):
     eye = shape[36:68]
-    print("EAR: "+str(fm.EAR(eye))+"\n")
-    print("MAR: "+str(fm.MAR(eye))+"\n")
-    print("eyeCircularity: "+str(fm.eyeCircularity(eye))+"\n")
-    print("mouth_over_eye: "+str(fm.mouth_over_eye(eye))+"")
+    avEAR.append(fm.EAR(eye))
+    avMAR.append(fm.MAR(eye))
+    avCIR.append(fm.eyeCircularity(eye))
+    avMOE.append(fm.mouth_over_eye(eye))
+
+    print("EAR: "+str(avEAR[len(avEAR)-1])+"\n")
+    print("MAR: "+str(avMAR[len(avMAR)-1])+"\n")
+    print("eyeCircularity: "+str(avCIR[len(avCIR)-1])+"\n")
+    print("mouth_over_eye: "+str(avMOE[len(avMOE)-1])+"")
 
 camera = cv2.VideoCapture(0)
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
@@ -37,12 +52,11 @@ while True:
         faces = faceDetector(image, 0)
         for(i, face) in enumerate(faces):
             shape = facePredictor(grayScale, face)
-
             shape = face_utils.shape_to_np(shape)
             #landmarks = getLandmarks(shape)
             for (x,y) in shape: #For the coordinates saved in shape, extracted from the photo.
                 cv2.circle (image, (x,y),2, (0, 0, 255),-1)
-            #draw a circle at x,y with a radius of 2, green colour
+            #draw a circle at x,y with a radius of 2, red colour
             os.system("clear")
             printMeasurements(shape)
             #name = path + "face"+str(i)+ ".png"
@@ -54,6 +68,9 @@ while True:
         cv2.imshow("Image",image)
         if cv2.waitKey(1) & 0xFF == 27:
             break
+file = open(path+"results.txt",'w')
+printAveragesToFile(file)
+file.close()
 camera.release()
 out.release()  
 cv2.destroyAllWindows()
