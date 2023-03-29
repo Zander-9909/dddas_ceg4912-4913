@@ -10,8 +10,11 @@ p = "shape_predictor_68_face_landmarks.dat"
 from mlxtend.image import extract_face_landmarks
 # Function to take in a photo and extract landmarks
 import os
+
 avEAR,avMAR, avCIR, avMOE = [],[],[],[]
-path = "/home/zander/CEG4912-3/dddas_ceg4912-4913/ml-python/frames/"
+path = os.path.dirname(__file__)
+path = os.path.join(path, 'frames/')
+#path = "/home/zander/CEG4912-3/dddas_ceg4912-4913/ml-python/frames/"
 
 faceDetector = dlib.get_frontal_face_detector() #dlib facial detector
 facePredictor = dlib.shape_predictor(p) #dlib face shape predictor
@@ -29,14 +32,14 @@ def printAveragesToFile(file):
     file.write("CIR:\t"+str(round(sum(avCIR)/len(avCIR),5))+"\t"+str(round(max(avCIR),5))+"\t"+str(round(min(avCIR),5))+"\n")
     file.write("MOE:\t"+str(round(sum(avMOE)/len(avMOE),5))+"\t"+str(round(max(avMOE),5))+"\t"+str(round(min(avMOE),5))+"\n")
 
-
 def printMeasurements(shape):
-    eye = shape[36:68]
-    avEAR.append(fm.EAR(eye))
-    avMAR.append(fm.MAR(eye))
-    avCIR.append(fm.eyeCircularity(eye))
-    avMOE.append(fm.mouth_over_eye(eye))
+    eye = shape[36:68]# Get useful facial landmarks (some are extraneous for our use, so we can ignore them.)
+    avEAR.append(fm.EAR(eye)) # Calculate the Eye Aspect Ratio from FeatureMeasurement.py
+    avMAR.append(fm.MAR(eye))# Calculate Mouth Aspect Ratio from FeatureMeasurement.py
+    avCIR.append(fm.eyeCircularity(eye))# Calculate the Eye Circularity from FeatureMeasurement.py
+    avMOE.append(fm.mouth_over_eye(eye))# Calculate the Mouth Over Eye ratio (MAR/EAR) from FeatureMeasurement.py
 
+    os.system("clear")
     print("EAR: "+str(avEAR[len(avEAR)-1])+"\n")
     print("MAR: "+str(avMAR[len(avMAR)-1])+"\n")
     print("eyeCircularity: "+str(avCIR[len(avCIR)-1])+"\n")
@@ -44,7 +47,7 @@ def printMeasurements(shape):
 
 camera = cv2.VideoCapture(0)
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
-out = cv2.VideoWriter(path+'output.avi', fourcc, 10.0, (1280, 720))
+out = cv2.VideoWriter(path+'/output.avi', fourcc, 20.0, (1280, 720))
 while True:
     succ, image = camera.read()
     if(succ):
@@ -57,7 +60,6 @@ while True:
             for (x,y) in shape: #For the coordinates saved in shape, extracted from the photo.
                 cv2.circle (image, (x,y),2, (0, 0, 255),-1)
             #draw a circle at x,y with a radius of 2, red colour
-            os.system("clear")
             printMeasurements(shape)
             #name = path + "face"+str(i)+ ".png"
             #cv2.imwrite(name, image)
@@ -65,7 +67,7 @@ while True:
         image = cv2.resize(image,(1280,720))
         out.write(image)
         
-        cv2.imshow("Image",image)
+        cv2.imshow("Live feed",image)
         if cv2.waitKey(1) & 0xFF == 27:
             break
 file = open(path+"results.txt",'w')
