@@ -16,3 +16,7 @@ wheel in intervals, and will call if there is no response from the driver
 + Leonardo Saavedra Morales
 #
 ![alt text](https://github.com/Zander-9909/dddas_ceg4912-4913/blob/main/assets/diagrams/hardware-architecture.png "Initial Architecture")
+
+
+To clone project, do git clone --recurse-submodules https://github.com/Zander-9909/dddas_ceg4912-4913.git
+This will also clone and update the submodule dlib used within the project.
