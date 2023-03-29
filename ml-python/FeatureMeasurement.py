@@ -4,7 +4,7 @@ from scipy.spatial import distance
 # ^Must install with apt-get 
 
 #defines
-#Eye aspect ratio using the scipy library
+
 #As you get drowsy, this should decrease (eyes more closer)
 def EAR(eye): #numpy array
     leftVert = distance.euclidean(eye[1],eye[5])

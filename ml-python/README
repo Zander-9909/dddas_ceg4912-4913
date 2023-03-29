@@ -1,0 +1,10 @@
+Setup for OverlayLandmarks
+You must install CMake and pip3
+Uses sudo pip3 install to install the python packages:
+    opencv-python
+    imutils
+    scipy
+    numpy
+    mlxtend
+Use the "setup.py" in the dlib submodule to install dlib (use as sudo)
+Then to run OverlayLandmarks, run sudo python3 OverlayLandmarks.pys
