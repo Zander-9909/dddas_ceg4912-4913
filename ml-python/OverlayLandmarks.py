@@ -12,6 +12,8 @@ from mlxtend.image import extract_face_landmarks
 import os
 
 avEAR,avMAR, avCIR, avMOE = [],[],[],[]
+if not os.path.exists('frames'):
+    os.mkdir('frames/')
 path = os.path.dirname(__file__)
 path = os.path.join(path, 'frames/')
 #path = "/home/zander/CEG4912-3/dddas_ceg4912-4913/ml-python/frames/"
@@ -44,7 +46,6 @@ def printMeasurements(shape):
     print("MAR: "+str(avMAR[len(avMAR)-1])+"\n")
     print("eyeCircularity: "+str(avCIR[len(avCIR)-1])+"\n")
     print("mouth_over_eye: "+str(avMOE[len(avMOE)-1])+"")
-
 camera = cv2.VideoCapture(0)
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
 out = cv2.VideoWriter(path+'/output.avi', fourcc, 20.0, (1280, 720))

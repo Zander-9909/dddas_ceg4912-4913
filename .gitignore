@@ -26,6 +26,8 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+#Ignore frames folder
+ml-python/frames/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
