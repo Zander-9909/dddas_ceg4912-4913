@@ -17,7 +17,7 @@ function SigninScreen(props) {
     const [username, onChangeUsername] = React.useState('');
     const [password, onChangePassword] = React.useState('');
 
-    const handleSignin = async (username, password) => {
+    const handleSignin = async () => {
         const session_url = 'http://192.168.0.7:5000/users/signin';
     
         axios.post(session_url, {
@@ -27,6 +27,8 @@ function SigninScreen(props) {
             .then(response => {
                 if (response.status === 200) { // signin successful
                     navigation.navigate(Global.innerName);
+                    onChangeUsername('');
+                    onChangePassword('');
                     console.log(`User ${response.data.user.username} has successfully logged in.`);
                     // console.log(response.data.user); // logs user info from db
                 } 
@@ -35,7 +37,6 @@ function SigninScreen(props) {
                 console.log('Error', error.message);
             });
     };
-    
 
     return (
         <KeyboardAvoidingView
@@ -84,7 +85,7 @@ function SigninScreen(props) {
                     <View style={{ marginBottom: '20%' }}>
                         <Button
                             color='blue'
-                            onPress={() => handleSignin(username, password)}
+                            onPress={() => handleSignin}
                             title='Sign in'
                         />
                     </View>

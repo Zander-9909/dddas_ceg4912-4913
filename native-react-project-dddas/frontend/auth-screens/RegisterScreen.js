@@ -14,6 +14,32 @@ function RegisterScreen(props) {
     const [email, onChangeEmail] = React.useState('');
     const [password, onChangePassword] = React.useState('');
 
+    const handleRegister = async () => {
+        const session_url = 'http://192.168.0.7:5000/users/add';
+
+        axios.post(session_url, {
+            "username": username,
+            "firstName": firstName,
+            "lastName": lastName,
+            "email": email,
+            "password": password
+        })
+            .then(response => {
+                if (response.status === 200) { // register successful
+                    navigation.navigate(Global.signinScreenName);
+                    onChangeFirstName('');
+                    onChangeLastName('');
+                    onChangeUsername('');
+                    onChangeEmail('');
+                    onChangePassword('');
+                    console.log(`User has been registered.`);
+                }
+            })
+            .catch(error => {
+                console.log('Error', error.message);
+            });
+    };
+
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -93,7 +119,7 @@ function RegisterScreen(props) {
                         />
                         <Button
                             color='blue'
-                            onPress={() => navigation.navigate(Global.signinScreenName)}
+                            onPress={() => handleRegister}
                             title='CREATE NEW ACCOUNT'
                         />
                     </View>
