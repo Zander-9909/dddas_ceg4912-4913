@@ -6,5 +6,5 @@ Uses sudo pip3 install to install the python packages:
     scipy
     numpy
     mlxtend
-Use the "setup.py" in the dlib submodule to install dlib (use as sudo)
+Use the "setup.py" in the dlib submodule to install dlib (use as sudo) [sudo python setup.py install]
 Then to run OverlayLandmarks, run sudo python3 OverlayLandmarks.pys

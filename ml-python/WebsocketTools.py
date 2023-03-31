@@ -3,19 +3,19 @@ import base64
 from flask import Flask, request
 
 app = Flask(__name__)
+cam = cv2.VideoCapture(0)
 
 @app.route('/image', methods=['POST'])
 def send_image():
     # Capture image
-    img = cv2.imread('image.jpg')
+    succ,img = cam.read()
+    if(succ):
+        # Encode image
+        _, encoded = cv2.imencode('.png', img)
+        encoded_string = base64.b64encode(encoded)
 
-    # Encode image
-    _, encoded = cv2.imencode('.png', img)
-    encoded_string = base64.b64encode(encoded)
-
-    # Send image
-    return {'image': encoded_string.decode()}
-
+        # Send image
+        return {'image': encoded_string.decode()}
 app.run(host='0.0.0.0')
 
 

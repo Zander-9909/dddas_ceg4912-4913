@@ -29,10 +29,10 @@ def getLandmarks(image):
 
 def printAveragesToFile(file):
     file.write("Val:\tMean\t Max\t Min\n")
-    file.write("EAR:\t"+str(round(sum(avEAR)/len(avEAR),5))+"\t"+str(round(max(avEAR),5))+"\t"+str(round(min(avEAR),5))+"\n")
-    file.write("MAR:\t"+str(round(sum(avMAR)/len(avMAR),5))+"\t"+str(round(max(avMAR),5))+"\t"+str(round(min(avMAR),5))+"\n")
-    file.write("CIR:\t"+str(round(sum(avCIR)/len(avCIR),5))+"\t"+str(round(max(avCIR),5))+"\t"+str(round(min(avCIR),5))+"\n")
-    file.write("MOE:\t"+str(round(sum(avMOE)/len(avMOE),5))+"\t"+str(round(max(avMOE),5))+"\t"+str(round(min(avMOE),5))+"\n")
+    file.write("EAR:\t"+str(round(sum(avEAR)/len(avEAR),4))+"\t"+str(round(max(avEAR),4))+"\t"+str(round(min(avEAR),4))+"\n")
+    file.write("MAR:\t"+str(round(sum(avMAR)/len(avMAR),4))+"\t"+str(round(max(avMAR),4))+"\t"+str(round(min(avMAR),4))+"\n")
+    file.write("CIR:\t"+str(round(sum(avCIR)/len(avCIR),4))+"\t"+str(round(max(avCIR),4))+"\t"+str(round(min(avCIR),4))+"\n")
+    file.write("MOE:\t"+str(round(sum(avMOE)/len(avMOE),4))+"\t"+str(round(max(avMOE),4))+"\t"+str(round(min(avMOE),4))+"\n")
 
 def printMeasurements(shape):
     eye = shape[36:68]# Get useful facial landmarks (some are extraneous for our use, so we can ignore them.)
@@ -48,7 +48,7 @@ def printMeasurements(shape):
     print("MOE: "+str(avMOE[len(avMOE)-1])+"")
 camera = cv2.VideoCapture(2)
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
-out = cv2.VideoWriter(path+'/output.avi', fourcc, 20.0, (1280, 720))
+out = cv2.VideoWriter(path+'/output.avi', fourcc, 2.0, (1920, 1080))
 while True:
     succ, image = camera.read()
     if(succ):
@@ -57,22 +57,21 @@ while True:
         for(i, face) in enumerate(faces):
             shape = facePredictor(grayScale, face)
             shape = face_utils.shape_to_np(shape)
-            #landmarks = getLandmarks(shape)
             for (x,y) in shape: #For the coordinates saved in shape, extracted from the photo.
                 cv2.circle (image, (x,y),2, (0, 0, 255),-1)
             #draw a circle at x,y with a radius of 2, red colour
             printMeasurements(shape)
-            #name = path + "face"+str(i)+ ".png"
-            #cv2.imwrite(name, image)
         # Show the image
-        image = cv2.resize(image,(1280,720))
+        image = cv2.resize(image,(1920,1080))
         out.write(image)
         
         cv2.imshow("Live feed",image)
-        if cv2.waitKey(1) & 0xFF == 27:
+        if cv2.waitKey(500) & 0xFF == 27:
             break
 file = open(path+"results.txt",'w')
 printAveragesToFile(file)
+os.system("clear")
+print("Saved results and video to /frames directory. Exiting.")
 file.close()
 camera.release()
 out.release()  
