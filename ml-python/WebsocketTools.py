@@ -1,6 +1,6 @@
-import cv2
+import cv2 #opencv-python (not sure if that's the name on OSX, check opencv website)
 import base64
-from flask import Flask, request
+from flask import Flask, request #install pip and use pip install flask
 
 app = Flask(__name__)
 cam = cv2.VideoCapture(0)
