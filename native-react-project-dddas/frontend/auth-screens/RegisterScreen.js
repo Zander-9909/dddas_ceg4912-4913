@@ -4,6 +4,7 @@ import {
     TextInput, Keyboard, Button, Image
 } from 'react-native';
 import Logo from '../../assets/logo.png';
+import axios from 'axios';
 import Global from '../navigation/Global';
 
 function RegisterScreen(props) {
@@ -14,8 +15,8 @@ function RegisterScreen(props) {
     const [email, onChangeEmail] = React.useState('');
     const [password, onChangePassword] = React.useState('');
 
-    const handleRegister = async () => {
-        const session_url = 'http://192.168.0.7:5000/users/add';
+    const handleRegister = async (username, firstName, lastName, email, password) => {
+        const session_url = 'http://172.20.10.3:5000/users/add';
 
         axios.post(session_url, {
             "username": username,
@@ -119,7 +120,7 @@ function RegisterScreen(props) {
                         />
                         <Button
                             color='blue'
-                            onPress={() => handleRegister}
+                            onPress={() => handleRegister(username, firstName, lastName, email, password)}
                             title='CREATE NEW ACCOUNT'
                         />
                     </View>

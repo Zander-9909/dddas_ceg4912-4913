@@ -7,18 +7,13 @@ import {
 import Logo from '../../assets/logo.png';
 import Global from '../navigation/Global';
 
-// screen names
-const forgotPasswordName = 'ForgotPassword';
-const registerName = 'Register';
-const navigationName = 'Navigation_';
-
 function SigninScreen(props) {
     const { navigation } = props;
     const [username, onChangeUsername] = React.useState('');
     const [password, onChangePassword] = React.useState('');
 
-    const handleSignin = async () => {
-        const session_url = 'http://192.168.0.7:5000/users/signin';
+    const handleSignin = async (username, password) => {
+        const session_url = 'http://172.20.10.3:5000/users/signin';
     
         axios.post(session_url, {
             "username": username,
@@ -85,7 +80,7 @@ function SigninScreen(props) {
                     <View style={{ marginBottom: '20%' }}>
                         <Button
                             color='blue'
-                            onPress={() => handleSignin}
+                            onPress={() => handleSignin(username, password)}
                             title='Sign in'
                         />
                     </View>

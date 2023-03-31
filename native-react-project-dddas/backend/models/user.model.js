@@ -39,7 +39,6 @@ const userSchema = new Schema({
         type: String,
         required: true,
         trim: true,
-        minlength: 6,
         validate: {
             validator: function (v) {
                 return v.length >= 5;
