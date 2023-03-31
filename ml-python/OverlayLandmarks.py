@@ -44,9 +44,9 @@ def printMeasurements(shape):
     os.system("clear")
     print("EAR: "+str(avEAR[len(avEAR)-1])+"\n")
     print("MAR: "+str(avMAR[len(avMAR)-1])+"\n")
-    print("eyeCircularity: "+str(avCIR[len(avCIR)-1])+"\n")
-    print("mouth_over_eye: "+str(avMOE[len(avMOE)-1])+"")
-camera = cv2.VideoCapture(0)
+    print("EyeCirc: "+str(avCIR[len(avCIR)-1])+"\n")
+    print("MOE: "+str(avMOE[len(avMOE)-1])+"")
+camera = cv2.VideoCapture(2)
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
 out = cv2.VideoWriter(path+'/output.avi', fourcc, 20.0, (1280, 720))
 while True:
