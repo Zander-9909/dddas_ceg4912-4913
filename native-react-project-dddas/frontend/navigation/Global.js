@@ -1,10 +1,16 @@
 export default {
     forgotPasswordName: 'ForgotPassword',
-    signinScreenName: 'Signin',
+    signinName: 'Signin',
     registerName: 'Register',
+
     innerName: 'Inner',
+    outerName: 'Outer',
+    settingsNavName: 'Settings',
+
     navigationName: 'Navigation',
     alertsName: 'Alerts',
     statsName: 'Stats',
-    settingsName: 'Settings'
+    settingsName: 'Settingz',
+    
+    cameraOutputName: 'CameraOutput'
 };

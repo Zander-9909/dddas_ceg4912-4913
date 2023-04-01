@@ -14,9 +14,9 @@ function OuterNavigator() {
 	return (
 		<Stack.Navigator
 			screenOptions={{}}
-			initialRouteName={Global.signinScreenName}>
+			initialRouteName={Global.signinName}>
 
-			<Stack.Screen name={Global.signinScreenName}
+			<Stack.Screen name={Global.signinName}
 				component={SigninScreen}
 				options={{
 					headerShown: false,

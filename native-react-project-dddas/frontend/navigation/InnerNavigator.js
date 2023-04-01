@@ -6,8 +6,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import NavigationScreen from '../screens/NavigationScreen';
 import AlertsScreen from '../screens/AlertsScreen';
 import StatsScreen from '../screens/StatsScreen';
-import SettingsScreen from '../screens/SettingsScreen';
 import Global from './Global';
+import SettingsNavigator from './SettingsNavigator';
 
 const Tab = createBottomTabNavigator();
 
@@ -36,7 +36,7 @@ function InnerNavigator() {
                         case Global.statsName:
                             iconName = focused ? 'stats-chart' : 'stats-chart-outline';
                             break;
-                        case Global.settingsName:
+                        case Global.settingsNavName:
                             iconName = focused ? 'settings' : 'settings-outline';
                             break;
                     }
@@ -48,7 +48,7 @@ function InnerNavigator() {
             <Tab.Screen name={Global.navigationName} component={NavigationScreen} />
             <Tab.Screen name={Global.alertsName} component={AlertsScreen} />
             <Tab.Screen name={Global.statsName} component={StatsScreen} />
-            <Tab.Screen name={Global.settingsName} component={SettingsScreen} />
+            <Tab.Screen name={Global.settingsNavName} component={SettingsNavigator} />
 
         </Tab.Navigator>
     );
