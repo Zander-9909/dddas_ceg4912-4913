@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, SafeAreaView, Button } from 'react-native';
+import { StyleSheet, Text, SafeAreaView, View, Button } from 'react-native';
 
 // screens
 const signinScreenName = 'Signin';
@@ -9,25 +9,39 @@ function SettingsScreen(props) {
 
     return (
         <SafeAreaView style={styles.background}>
-            <Text>This is the Settings screen</Text>
 
-            <Button
+            <View style={styles.rect}></View>
+
+            <TouchableOpacity
+                onPress={() => navigation.navigate()}
+                style={styles.rect}
+            ></TouchableOpacity>
+
+            <View style={styles.rect}></View>
+
+            <View style={styles.rect}></View>
+
+            <TouchableOpacity
                 onPress={() => navigation.navigate(signinScreenName)}
                 title='Sign out'
-                style={{}}
-                // accessibilityLabel="Learn more about this purple button"
-            />
-        </SafeAreaView>
+                style={styles.rect}
+            ></TouchableOpacity>
+
+        </SafeAreaView >
     );
 }
 
 const styles = StyleSheet.create({
     background: {
         flex: 1,
-        backgroundColor: '#b5e7a0',
         alignItems: 'center',
         justifyContent: 'center',
     },
+    rect: {
+        width: '90%',
+        height: '3.5%',
+        backgroundColor: "#E6E6E6",
+    },  
 })
 
 export default SettingsScreen;
