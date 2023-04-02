@@ -4,7 +4,6 @@ import SettingsScreen from '../screens/SettingsScreen';
 
 import CameraOutput from '../screens/SettingsComponents/CameraOutput';
 import Global from './Global';
-import OuterNavigator from './OuterNavigator';
 
 const Stack = createStackNavigator();
 
@@ -27,12 +26,12 @@ function SettingsNavigator() {
                 title: 'Facial Detection'
             }}
             />
-            <Stack.Screen name={Global.outerName}
+            {/* <Stack.Screen name={Global.outerName}
             component={OuterNavigator} 
             options={{
                 headerShown: false, // hide the top bar when navigating from outer to inner
                 gestureEnabled: false // cannot swipe back from inner to outer navigations
-            }}/>
+            }}/> */}
 
         </Stack.Navigator>
     );
