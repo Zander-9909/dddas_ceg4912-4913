@@ -1,6 +1,6 @@
 Setup for OverlayLandmarks
 You must install CMake and pip3
-Uses sudo pip3 install to install the python packages:
+Use sudo pip3 install to install the python packages:
     opencv-python
     imutils
     scipy
