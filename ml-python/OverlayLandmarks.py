@@ -2,6 +2,7 @@
 #extract certain facial landmarks from it, and overlay them onto the photo
 import cv2
 import math
+import sys
 import FeatureMeasurement as fm
 from imutils import face_utils
 import dlib #required for mlxtend to function.
@@ -16,7 +17,6 @@ if not os.path.exists('frames'):
     os.mkdir('frames/')
 path = os.path.dirname(__file__)
 path = os.path.join(path, 'frames/')
-#path = "/home/zander/CEG4912-3/dddas_ceg4912-4913/ml-python/frames/"
 
 faceDetector = dlib.get_frontal_face_detector() #dlib facial detector
 facePredictor = dlib.shape_predictor(p) #dlib face shape predictor
@@ -45,34 +45,41 @@ def printMeasurements(shape):
     print("EAR: "+str(avEAR[len(avEAR)-1])+"\n")
     print("MAR: "+str(avMAR[len(avMAR)-1])+"\n")
     print("EyeCirc: "+str(avCIR[len(avCIR)-1])+"\n")
-    print("MOE: "+str(avMOE[len(avMOE)-1])+"")
-camera = cv2.VideoCapture(2)
-fourcc = cv2.VideoWriter_fourcc(*'XVID')
-out = cv2.VideoWriter(path+'/output.avi', fourcc, 2.0, (1920, 1080))
-while True:
-    succ, image = camera.read()
-    if(succ):
-        grayScale = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)#Make grayscale
-        faces = faceDetector(image, 0)
-        for(i, face) in enumerate(faces):
-            shape = facePredictor(grayScale, face)
-            shape = face_utils.shape_to_np(shape)
-            for (x,y) in shape: #For the coordinates saved in shape, extracted from the photo.
-                cv2.circle (image, (x,y),2, (0, 0, 255),-1)
-            #draw a circle at x,y with a radius of 2, red colour
-            printMeasurements(shape)
-        # Show the image
-        image = cv2.resize(image,(1920,1080))
-        out.write(image)
-        
-        cv2.imshow("Live feed",image)
-        if cv2.waitKey(500) & 0xFF == 27:
-            break
-file = open(path+"results.txt",'w')
-printAveragesToFile(file)
-os.system("clear")
-print("Saved results and video to /frames directory. Exiting.")
-file.close()
-camera.release()
-out.release()  
-cv2.destroyAllWindows()
+    print("MOE: "+str(avMOE[len(avMOE)-1])+"\n")
+    print("Press ESC to exit.")
+
+def liveDemo(delay,camNum):
+    camera = cv2.VideoCapture(camNum)
+    fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    out = cv2.VideoWriter(path+'/output.avi', fourcc, 10.0, (1280, 720))
+    while True:
+        succ, image = camera.read()
+        if(succ):
+            grayScale = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)#Make grayscale
+            faces = faceDetector(image, 0)
+            for(i, face) in enumerate(faces):
+                shape = facePredictor(grayScale, face)
+                shape = face_utils.shape_to_np(shape)
+                for (x,y) in shape: #For the coordinates saved in shape, extracted from the photo.
+                    cv2.circle (image, (x,y),2, (0, 0, 255),-1)
+                #draw a circle at x,y with a radius of 2, red colour
+                printMeasurements(shape)
+            # Show the image
+            image = cv2.resize(image,(1280,720))
+            out.write(image)
+            
+            cv2.imshow("Live feed",image)
+            if cv2.waitKey(delay) & 0xFF == 27:
+                break
+    file = open(path+"results.txt",'w')
+    printAveragesToFile(file)
+    os.system("clear")
+    print("Saved results and video to /frames directory. Exiting.")
+    file.close()
+    camera.release()
+    out.release()  
+    cv2.destroyAllWindows()
+
+#main
+#Arguments are [period of pictures, in ms][0 for default camera, 2 for secondary (if on laptop)]
+liveDemo(int(sys.argv[1]),int(sys.argv[2]))
