@@ -7,4 +7,6 @@ Use sudo pip3 install to install the python packages:
     numpy
     mlxtend
 Use the "setup.py" in the dlib submodule to install dlib (use as sudo) [sudo python setup.py install]
-Then to run OverlayLandmarks, run sudo python3 OverlayLandmarks.pys
+Then to run OverlayLandmarks, run sudo python3 OverlayLandmarks.py arg1 arg2
+Arg1 is the period for picture taking, in ms. 
+arg2 is to select which camera to use (if a device has multiple). 0 is for the default, 2 for a secondary one. 
