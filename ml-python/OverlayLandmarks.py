@@ -82,4 +82,9 @@ def liveDemo(delay,camNum):
 
 #main
 #Arguments are [period of pictures, in ms][0 for default camera, 2 for secondary (if on laptop)]
-liveDemo(int(sys.argv[1]),int(sys.argv[2]))
+
+if(len(sys.argv) == 3):
+    liveDemo(int(sys.argv[1]),int(sys.argv[2]))
+else:
+    print("No parameters set, running at 100ms and default camera.")
+    liveDemo(100,0)
