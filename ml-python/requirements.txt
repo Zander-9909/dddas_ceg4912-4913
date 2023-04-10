@@ -1,0 +1,7 @@
+imutils
+scipy
+numpy
+scikit-learn
+setuptools
+joblib
+mlxtend
