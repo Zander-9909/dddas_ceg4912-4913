@@ -7,8 +7,6 @@ import FeatureMeasurement as fm
 from imutils import face_utils
 import dlib #required for mlxtend to function.
 p = "shape_predictor_68_face_landmarks.dat"
-#p = "models/shape_predictor_gtx.dat"
-
 # ^ dlib landmark example file for it to compare to
 from mlxtend.image import extract_face_landmarks
 # Function to take in a photo and extract landmarks
@@ -48,10 +46,10 @@ def printMeasurements(shape):
     print("MAR: "+str(avMAR[len(avMAR)-1])+"\n")
     print("EyeCirc: "+str(avCIR[len(avCIR)-1])+"\n")
     print("MOE: "+str(avMOE[len(avMOE)-1])+"\n")
-    print("Press ESC to exit.")
+    print("Press q to exit.")
 
 def liveDemo(delay,camNum):
-    camera = cv2.VideoCapture(camNum,cv2.CAP_FFMPEG)
+    camera = cv2.VideoCapture(camNum)
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
     out = cv2.VideoWriter(path+'/output.avi', fourcc, 10.0, (1280, 720))
     while True:
