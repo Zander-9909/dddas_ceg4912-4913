@@ -3,8 +3,10 @@
 import cv2
 from datetime import datetime
 import sys
+from imutils.video import WebcamVideoStream
 import FeatureMeasurement as fm
 from imutils import face_utils
+import imutils
 import VideoThreads as vt
 import dlib #required for mlxtend to function.
 #p = "shape_predictor_68_face_landmarks.dat"
@@ -23,7 +25,7 @@ path = os.path.join(path, 'frames/')
 faceDetector = dlib.get_frontal_face_detector() #dlib facial detector
 facePredictor = dlib.shape_predictor(p) #dlib face shape predictor
 
-def getLandmarks():
+def withThreading():
     # created a *threaded* video stream, allow the camera sensor to warmup,
     # and start the FPS counter
     vs = vt.WebcamVideoStream(src=0).start()
@@ -33,7 +35,7 @@ def getLandmarks():
     # loop over some frames...this time using the threaded stream
     while True:
         startC = cv2.getTickCount()
-        image = vs.frame
+        image = vs.read()
         image = cv2.resize(image,(640,480))
         grayScale = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)#Make grayscale
         startTime = cv2.getTickCount()
@@ -52,7 +54,7 @@ def getLandmarks():
         out.write(image)
         
         cv2.imshow("Live feed",image)
-        if cv2.waitKey(10) & 0xFF == 27:
+        if cv2.waitKey(1) & 0xFF == 27:
             break
         timeC =(cv2.getTickCount() - startC)/ cv2.getTickFrequency()
         timesC.append(timeC)
@@ -93,10 +95,10 @@ def printMeasurements(shape,timeP,timeD):
     print("TTP: "+str(timeP)+"\n")
     print("Press ESC to exit.")
 
-def liveDemo(delay,camNum):
+def noThreading(delay,camNum):
     camera = cv2.VideoCapture(camNum)
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    out = cv2.VideoWriter(path+'/output.avi', fourcc, 10.0, (1280, 720))
+    out = cv2.VideoWriter(path+'/output.avi', fourcc, 15.0, (640, 480))
     while True:
         succ, image = camera.read()
         if(succ):
@@ -110,7 +112,7 @@ def liveDemo(delay,camNum):
                 #draw a circle at x,y with a radius of 2, red colour
                 printMeasurements(shape)
             # Show the image
-            image = cv2.resize(image,(1280,720))
+            image = cv2.resize(image,(640,480))
             out.write(image)
             
             cv2.imshow("Live feed",image)
@@ -129,7 +131,7 @@ def liveDemo(delay,camNum):
 #Arguments are [period of pictures, in ms][0 for default camera, 2 for secondary (if on laptop)]
 
 if(len(sys.argv) == 3):
-    liveDemo(int(sys.argv[1]),int(sys.argv[2]))
+    noThreading(int(sys.argv[1]),int(sys.argv[2]))
 else:
     print("No parameters set, running at 100ms and default camera.")
-    getLandmarks()
+    noThreading()
