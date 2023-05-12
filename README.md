@@ -17,6 +17,7 @@ wheel in intervals, and will call if there is no response from the driver
 #
 ![alt text](https://github.com/Zander-9909/dddas_ceg4912-4913/blob/main/assets/diagrams/hardware-architecture.png "Initial Architecture")
 
+NOTE: If you are running this on a raspberry pi or similar ARM processor, it is highly recommended to compile dlib and OpenCV with Neon instruction, OpenBLAS, and VFPv3 support. This will significantly increase performance
 
 To clone project, do ```git clone --recurse-submodules https://github.com/Zander-9909/dddas_ceg4912-4913.git```
 This will also clone and update the submodule dlib used within the project.
