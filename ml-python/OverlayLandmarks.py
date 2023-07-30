@@ -7,8 +7,10 @@ import FeatureMeasurement as fm
 from imutils import face_utils
 import VideoThreads as vt
 import dlib #required for mlxtend to function.
+
 #p = "shape_predictor_68_face_landmarks.dat"
 p = "models/shape_predictor_gtx.dat"
+d = "models/haarcascade_frontalface_default.xml"
 
 # ^ dlib landmark example file for it to compare to
 from mlxtend.image import extract_face_landmarks
@@ -21,7 +23,8 @@ if not os.path.exists('frames'):
 path = os.path.dirname(__file__)
 path = os.path.join(path, 'frames/')
 
-faceDetector = dlib.get_frontal_face_detector() #dlib facial detector
+#faceDetector = dlib.get_frontal_face_detector() #dlib facial detector
+faceDetector = cv2.CascadeClassifier(d) # Using lighter weight Haar cascade face detector
 facePredictor = dlib.shape_predictor(p) #dlib face shape predictor
 
 def printAveragesToFile(file):
