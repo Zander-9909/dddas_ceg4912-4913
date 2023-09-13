@@ -11,6 +11,7 @@ import VideoThreads as vt
 import dlib #required for mlxtend to function.
 #p = "shape_predictor_68_face_landmarks.dat"
 p = "models/shape_predictor_gtx.dat"
+d = "models/haarcascade_frontalface_default.xml"
 # ^ dlib landmark example file for it to compare to
 from mlxtend.image import extract_face_landmarks
 # Function to take in a photo and extract landmarks
