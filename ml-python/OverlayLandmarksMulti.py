@@ -22,7 +22,8 @@ if not os.path.exists('frames'):
 path = os.path.dirname(__file__)
 path = os.path.join(path, 'frames/')
 
-faceDetector = dlib.get_frontal_face_detector() #dlib facial detector
+#faceDetector = dlib.get_frontal_face_detector() #dlib facial detector
+faceDetector = cv2.CascadeClassifier(d) # Using lighter weight Haar cascade face detector
 facePredictor = dlib.shape_predictor(p) #dlib face shape predictor
 
 def withThreading():
