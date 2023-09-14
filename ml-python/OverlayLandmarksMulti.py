@@ -9,9 +9,11 @@ from imutils import face_utils
 import imutils
 import VideoThreads as vt
 import dlib #required for mlxtend to function.
+
 #p = "shape_predictor_68_face_landmarks.dat"
 p = "models/shape_predictor_gtx.dat"
 d = "models/haarcascade_frontalface_default.xml"
+
 # ^ dlib landmark example file for it to compare to
 from mlxtend.image import extract_face_landmarks
 # Function to take in a photo and extract landmarks
@@ -26,46 +28,6 @@ path = os.path.join(path, 'frames/')
 #faceDetector = dlib.get_frontal_face_detector() #dlib facial detector
 faceDetector = cv2.CascadeClassifier(d) # Using lighter weight Haar cascade face detector
 facePredictor = dlib.shape_predictor(p) #dlib face shape predictor
-
-def withThreading():
-    # created a *threaded* video stream, allow the camera sensor to warmup,
-    # and start the FPS counter
-    vs = vt.WebcamVideoStream(src=0).start()
-    fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    out = cv2.VideoWriter(path+'outputMulti.avi', fourcc, 15.0, (640,480))
-
-    # loop over some frames...this time using the threaded stream
-    while True:
-        startC = cv2.getTickCount()
-        image = vs.read()
-        image = cv2.resize(image,(640,480))
-        grayScale = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)#Make grayscale
-        faces = faceDetector.detectMultiScale(grayScale, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30),flags=cv2.CASCADE_SCALE_IMAGE)
-        for (x, y, w, h) in faces:
-            #Grabbing bounding box coordinates for facial detection
-            face = dlib.rectangle(int(x), int(y), int(x + w),int(y + h))
-            shape = facePredictor(grayScale, face)
-            shape = face_utils.shape_to_np(shape)
-            for (x,y) in shape: #For the coordinates saved in shape, extracted from the photo.
-                cv2.circle (image, (x,y),2, (0, 0, 255),-1)
-            #draw a circle at x,y with a radius of 2, red colour
-            printMeasurements(shape)
-        # Show the image
-        out.write(image)
-        
-        cv2.imshow("Live feed",image)
-        if cv2.waitKey(1) & 0xFF == 27:
-            break
-        timeC =(cv2.getTickCount() - startC)/ cv2.getTickFrequency()
-        timesC.append(timeC)
-    file = open(path+"resultsMulti.txt",'w')
-    printAveragesToFile(file)
-    os.system("clear")
-    print("Saved results and video to /frames directory. Exiting.")
-    file.close()
-    out.release()  
-    cv2.destroyAllWindows()
-    vs.stop()
 
 def printAveragesToFile(file):
     file.write("Val:\tMean\t Max\t Min\n")
@@ -95,15 +57,58 @@ def printMeasurements(shape,timeP,timeD):
     print("TTP: "+str(timeP)+"\n")
     print("Press ESC to exit.")
 
+def withThreading():
+    # created a *threaded* video stream, allow the camera sensor to warmup,
+    # and start the FPS counter
+    vs = vt.WebcamVideoStream(src=0).start()
+    fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    out = cv2.VideoWriter(path+'outputMulti.avi', fourcc, 15.0, (640,480))
+
+    # loop over some frames...this time using the threaded stream
+    while True:
+        startC = cv2.getTickCount()
+        image = vs.read()
+        image = cv2.resize(image,(640,480))
+        grayScale = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)#Make grayscale
+        startTime = cv2.getTickCount()
+        faces = faceDetector.detectMultiScale(grayScale, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30),flags=cv2.CASCADE_SCALE_IMAGE)
+        timeD = (cv2.getTickCount() - startTime)/ cv2.getTickFrequency()
+        for (x, y, w, h) in faces:
+            #Grabbing bounding box coordinates for facial detection
+            face = dlib.rectangle(int(x), int(y), int(x + w),int(y + h))
+            startTime = cv2.getTickCount() #Starting time for prediction measurement
+            shape = facePredictor(grayScale, face)
+            timeP=(cv2.getTickCount() - startTime)/ cv2.getTickFrequency()
+            shape = face_utils.shape_to_np(shape)
+            for (x,y) in shape: #For the coordinates saved in shape, extracted from the photo.
+                cv2.circle (image, (x,y),2, (0, 0, 255),-1)
+            #draw a circle at x,y with a radius of 2, red colour
+            printMeasurements(shape,timeP,timeD)
+        # Show the image
+        out.write(image)
+            
+        cv2.imshow("Live feed",image)
+        if cv2.waitKey(100) & 0xFF == 27:
+            break
+        timeC =(cv2.getTickCount() - startC)/ cv2.getTickFrequency()
+        timesC.append(timeC)
+    file = open(path+"resultsMulti.txt",'w')
+    printAveragesToFile(file)
+    os.system("clear")
+    print("Saved results and video to /frames directory. Exiting.")
+    file.close()
+    out.release()  
+    cv2.destroyAllWindows()
+    vs.stop()
+
 def noThreading(delay,camNum):
-    width = 480
-    height = 640
+    width = 640
+    height = 480
     camera = cv2.VideoCapture(camNum)
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    out = cv2.VideoWriter(path+'output.avi', fourcc, 15.0, (width, height))
+    out = cv2.VideoWriter(path+'/output.avi', fourcc, 15.0, (width, height))
     
-    while True:
-        
+    while True:  
         startC = cv2.getTickCount()
         succ, image = camera.read()
         if(succ):
