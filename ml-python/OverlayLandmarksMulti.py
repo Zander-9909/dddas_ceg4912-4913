@@ -32,7 +32,7 @@ def withThreading():
     # and start the FPS counter
     vs = vt.WebcamVideoStream(src=0).start()
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    out = cv2.VideoWriter(path+'/outputMulti.avi', fourcc, 15.0, (640,480))
+    out = cv2.VideoWriter(path+'outputMulti.avi', fourcc, 15.0, (640,480))
 
     # loop over some frames...this time using the threaded stream
     while True:
@@ -40,18 +40,16 @@ def withThreading():
         image = vs.read()
         image = cv2.resize(image,(640,480))
         grayScale = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)#Make grayscale
-        startTime = cv2.getTickCount()
-        faces = faceDetector(image, 0)
-        timeD = (cv2.getTickCount() - startTime)/ cv2.getTickFrequency()
-        for(i, face) in enumerate(faces):
-            startTime = cv2.getTickCount()
+        faces = faceDetector.detectMultiScale(grayScale, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30),flags=cv2.CASCADE_SCALE_IMAGE)
+        for (x, y, w, h) in faces:
+            #Grabbing bounding box coordinates for facial detection
+            face = dlib.rectangle(int(x), int(y), int(x + w),int(y + h))
             shape = facePredictor(grayScale, face)
-            timeP=(cv2.getTickCount() - startTime)/ cv2.getTickFrequency()
             shape = face_utils.shape_to_np(shape)
             for (x,y) in shape: #For the coordinates saved in shape, extracted from the photo.
                 cv2.circle (image, (x,y),2, (0, 0, 255),-1)
             #draw a circle at x,y with a radius of 2, red colour
-            printMeasurements(shape,timeP,timeD)
+            printMeasurements(shape)
         # Show the image
         out.write(image)
         
@@ -98,28 +96,41 @@ def printMeasurements(shape,timeP,timeD):
     print("Press ESC to exit.")
 
 def noThreading(delay,camNum):
+    width = 480
+    height = 640
     camera = cv2.VideoCapture(camNum)
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    out = cv2.VideoWriter(path+'/output.avi', fourcc, 15.0, (640, 480))
+    out = cv2.VideoWriter(path+'output.avi', fourcc, 15.0, (width, height))
+    
     while True:
+        
+        startC = cv2.getTickCount()
         succ, image = camera.read()
         if(succ):
+            image = cv2.resize(image,(width,height))
             grayScale = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)#Make grayscale
-            faces = faceDetector(image, 0)
-            for(i, face) in enumerate(faces):
+            startTime = cv2.getTickCount()
+            faces = faceDetector.detectMultiScale(grayScale, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30),flags=cv2.CASCADE_SCALE_IMAGE)
+            timeD = (cv2.getTickCount() - startTime)/ cv2.getTickFrequency()
+            for (x, y, w, h) in faces:
+                #Grabbing bounding box coordinates for facial detection
+                face = dlib.rectangle(int(x), int(y), int(x + w),int(y + h))
+                startTime = cv2.getTickCount() #Starting time for prediction measurement
                 shape = facePredictor(grayScale, face)
+                timeP=(cv2.getTickCount() - startTime)/ cv2.getTickFrequency()
                 shape = face_utils.shape_to_np(shape)
                 for (x,y) in shape: #For the coordinates saved in shape, extracted from the photo.
                     cv2.circle (image, (x,y),2, (0, 0, 255),-1)
                 #draw a circle at x,y with a radius of 2, red colour
-                printMeasurements(shape)
+                printMeasurements(shape,timeP,timeD)
             # Show the image
-            image = cv2.resize(image,(640,480))
             out.write(image)
             
             cv2.imshow("Live feed",image)
             if cv2.waitKey(delay) & 0xFF == 27:
                 break
+            timeC =(cv2.getTickCount() - startC)/ cv2.getTickFrequency()
+            timesC.append(timeC)
     file = open(path+"results.txt",'w')
     printAveragesToFile(file)
     os.system("clear")
@@ -136,4 +147,5 @@ if(len(sys.argv) == 3):
     noThreading(int(sys.argv[1]),int(sys.argv[2]))
 else:
     print("No parameters set, running at 100ms and default camera.")
-    noThreading()
+    withThreading()
+    #noThreading(100, 0)

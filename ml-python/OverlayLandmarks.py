@@ -67,10 +67,12 @@ def liveDemo(delay,camNum,height, width):
             image = cv2.resize(image,(width,height))
             grayScale = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)#Make grayscale
             startTime = cv2.getTickCount()
-            faces = faceDetector(image, 0)
+            faces = faceDetector.detectMultiScale(grayScale, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30),flags=cv2.CASCADE_SCALE_IMAGE)
             timeD = (cv2.getTickCount() - startTime)/ cv2.getTickFrequency()
-            for(i, face) in enumerate(faces):
-                startTime = cv2.getTickCount()
+            for (x, y, w, h) in faces:
+                #Grabbing bounding box coordinates for facial detection
+                face = dlib.rectangle(int(x), int(y), int(x + w),int(y + h))
+                startTime = cv2.getTickCount() #Starting time for prediction measurement
                 shape = facePredictor(grayScale, face)
                 timeP=(cv2.getTickCount() - startTime)/ cv2.getTickFrequency()
                 shape = face_utils.shape_to_np(shape)
