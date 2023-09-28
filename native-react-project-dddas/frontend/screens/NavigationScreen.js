@@ -5,7 +5,7 @@ import { StyleSheet, Text, SafeAreaView } from 'react-native';
 function NavigationScreen(props) {
     return (
         <SafeAreaView style={styles.background}>
-            <Text>This is the Home screen</Text>
+            <Text>This is the Navigation screen</Text>
         </SafeAreaView>
     );
 }
@@ -13,7 +13,6 @@ function NavigationScreen(props) {
 const styles = StyleSheet.create({
     background: {
         flex: 1,
-        backgroundColor: '#e8bcf0',
         alignItems: 'center',
         justifyContent: 'center',
     },

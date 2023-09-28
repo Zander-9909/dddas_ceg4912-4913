@@ -12,7 +12,6 @@ function StatsScreen(props) {
 const styles = StyleSheet.create({
     background: {
         flex: 1,
-        backgroundColor: '#f9ccac',
         alignItems: 'center',
         justifyContent: 'center',
     },

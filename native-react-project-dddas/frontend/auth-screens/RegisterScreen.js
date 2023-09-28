@@ -16,7 +16,7 @@ function RegisterScreen(props) {
     const [password, onChangePassword] = React.useState('');
 
     const handleRegister = async (username, firstName, lastName, email, password) => {
-        const session_url = 'http://172.20.10.3:5000/users/add';
+        const session_url = 'http://192.168.0.92:5000/users/add';
 
         axios.post(session_url, {
             "username": username,

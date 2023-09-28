@@ -12,7 +12,6 @@ function AlertsScreen(props) {
 const styles = StyleSheet.create({
     background: {
         flex: 1,
-        backgroundColor: '#66ccff',
         alignItems: 'center',
         justifyContent: 'center',
     },

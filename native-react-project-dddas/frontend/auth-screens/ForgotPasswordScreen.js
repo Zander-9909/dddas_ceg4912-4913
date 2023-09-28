@@ -1,7 +1,13 @@
 import React from 'react';
-import { StyleSheet, Text, SafeAreaView } from 'react-native';
+import {
+    StyleSheet, Text, SafeAreaView, TouchableWithoutFeedback, KeyboardAvoidingView,
+    StatusBar, Keyboard, View, TextInput, Button
+} from 'react-native';
 
 function ForgotPasswordScreen(props) {
+
+    const [username, OnChangeUsername] = React.useState('');
+
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -14,9 +20,9 @@ function ForgotPasswordScreen(props) {
                     <View style={styles.inputContainer}>
                         <TextInput
                             style={[styles.textInput, styles.buttonMargin]}
-                            onChangeText={onChangePassword}
-                            value={password}
-                            placeholder='Password'
+                            onChangeText={OnChangeUsername}
+                            value={username}
+                            placeholder='Username'
 
                             secureTextEntry={true}
                             keyboardType='default'
@@ -26,7 +32,7 @@ function ForgotPasswordScreen(props) {
                         />
                         <Button
                             color='blue'
-                            onPress={() => handleRegister(username)}
+                            onPress={() => handleFP(username)}
                             title='RECOVER PASSWORD'
                         />
                     </View>
@@ -38,25 +44,25 @@ function ForgotPasswordScreen(props) {
 }
 
 const styles = StyleSheet.create({
-    container: { // for keyboard-avoiding-view
-        // flex: 1,
+    container: {
+        flex: 1,
         // paddingTop: StatusBar.currentHeight,
     },
-    inner: { // for touchable-without-feedback inner-view
-        // flex: 1,
+    inner: { 
+        flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
     },
-    inputContainer: { // for the 5 input fields
+    inputContainer: {
         // flex: 6,
         alignItems: 'center',
     },
-    textInput: { // for username and password
+    textInput: { 
         width: 200,
         height: 35,
         borderColor: '#000000',
         borderBottomWidth: 1,
     },
-    
+
 })
 export default ForgotPasswordScreen;
