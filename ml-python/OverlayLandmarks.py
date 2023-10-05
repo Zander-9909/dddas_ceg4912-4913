@@ -5,18 +5,14 @@ import math
 import FeatureMeasurement as fm
 from imutils import face_utils
 import dlib #required for mlxtend to function.
-p = "shape_predictor_68_face_landmarks.dat"
+p = "mlxtend_data/shape_predictor_68_face_landmarks.dat"
 # ^ dlib landmark example file for it to compare to
 from mlxtend.image import extract_face_landmarks
 # Function to take in a photo and extract landmarks
 import os
 
 avEAR,avMAR, avCIR, avMOE = [],[],[],[]
-if not os.path.exists('frames'):
-    os.mkdir('frames/')
-path = os.path.dirname(__file__)
-path = os.path.join(path, 'frames/')
-#path = "/home/zander/CEG4912-3/dddas_ceg4912-4913/ml-python/frames/"
+path = "Users/RyeTo/Documents/GitHub/dddas_ceg4912-4913/ml-python"
 
 faceDetector = dlib.get_frontal_face_detector() #dlib facial detector
 facePredictor = dlib.shape_predictor(p) #dlib face shape predictor
@@ -48,7 +44,7 @@ def printMeasurements(shape):
     print("mouth_over_eye: "+str(avMOE[len(avMOE)-1])+"")
 camera = cv2.VideoCapture(0)
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
-out = cv2.VideoWriter(path+'/output.avi', fourcc, 20.0, (1280, 720))
+out = cv2.VideoWriter(path+'/frames/output_001.avi', fourcc, 20.0, (1280, 720))
 while True:
     succ, image = camera.read()
     if(succ):
@@ -69,11 +65,11 @@ while True:
         out.write(image)
         
         cv2.imshow("Live feed",image)
-        if cv2.waitKey(1) & 0xFF == 27:
+        if (cv2.waitKey(1) & 0xFF) == ord('q'):
+            cv2.destroyAllWindows()
+            camera.release()
+            out.release()
             break
-file = open(path+"results.txt",'w')
+file = open("results.txt",'w')
 printAveragesToFile(file)
 file.close()
-camera.release()
-out.release()  
-cv2.destroyAllWindows()
