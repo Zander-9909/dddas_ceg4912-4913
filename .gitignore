@@ -145,6 +145,7 @@ dmypy.json
 *.jpx
 *.jpm
 *.mj2
+*.mkv
 
 # JPEG XR
 *.jxr

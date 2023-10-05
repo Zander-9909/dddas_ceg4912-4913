@@ -7,6 +7,7 @@ import FeatureMeasurement as fm
 from imutils import face_utils
 import VideoThreads as vt
 import dlib #required for mlxtend to function.
+import time
 
 #p = "shape_predictor_68_face_landmarks.dat"
 p = "models/shape_predictor_gtx.dat"
@@ -35,7 +36,6 @@ def printAveragesToFile(file):
     file.write("MOE:\t"+str(round(sum(avMOE)/len(avMOE),4))+"\t"+str(round(max(avMOE),4))+"\t"+str(round(min(avMOE),4))+"\n")
     file.write("TTP:\t"+str(round(sum(timesP)/len(timesP),4))+"\t"+str(round(max(timesP),4))+"\t"+str(round(min(timesP),4))+"\n")
     file.write("TTD:\t"+str(round(sum(timesD)/len(timesD),4))+"\t"+str(round(max(timesD),4))+"\t"+str(round(min(timesD),4))+"\n")
-    file.write("TTC:\t"+str(round(sum(timesC)/len(timesC),4))+"\t"+str(round(max(timesC),4))+"\t"+str(round(min(timesC),4))+"\n")
 
 def printMeasurements(shape,timeP,timeD):
     eye = shape[36:68]# Get useful facial landmarks (some are extraneous for our use, so we can ignore them.)
@@ -46,23 +46,34 @@ def printMeasurements(shape,timeP,timeD):
     timesD.append(timeD)
     timesP.append(timeP)
 
-    os.system("clear")
-    print("EAR: "+str(avEAR[len(avEAR)-1])+"\n")
-    print("MAR: "+str(avMAR[len(avMAR)-1])+"\n")
-    print("EyeCirc: "+str(avCIR[len(avCIR)-1])+"\n")
-    print("MOE: "+str(avMOE[len(avMOE)-1])+"\n")
-    print("TTD: "+str(timeD)+"\n")
-    print("TTP: "+str(timeP)+"\n")
-    print("Press ESC to exit.")
-
-def liveDemo(delay,camNum,height, width):
-    camera = cv2.VideoCapture("2023-10-05 17-45-37.mkv")
-    
-    while True:
-        startC = cv2.getTickCount()
-        succ, image = camera.read()
-        if(succ):
-            image = cv2.resize(image,(width,height))
+def video_to_frames(input_loc, output_loc):
+    """Function to extract frames from input video file
+    and save them as separate frames in an output directory.
+    Args:
+        input_loc: Input video file.
+        output_loc: Output directory to save the frames.
+    Returns:
+        None
+    """
+    try:
+        os.mkdir(output_loc)
+    except OSError:
+        pass
+    # Log the time
+    time_start = time.time()
+    # Start capturing the feed
+    cap = cv2.VideoCapture(input_loc)
+    # Find the number of frames
+    video_length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) - 1
+    print ("Number of frames: ", video_length)
+    count = 0
+    print ("Converting video..\n")
+    # Start converting the video
+    while cap.isOpened():
+        # Extract the frame
+        ret, image = cap.read()
+        if(ret):
+            image = cv2.resize(image,(300,300))
             grayScale = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)#Make grayscale
             startTime = cv2.getTickCount()
             faces = faceDetector.detectMultiScale(grayScale, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30),flags=cv2.CASCADE_SCALE_IMAGE)
@@ -74,33 +85,25 @@ def liveDemo(delay,camNum,height, width):
                 shape = facePredictor(grayScale, face)
                 timeP=(cv2.getTickCount() - startTime)/ cv2.getTickFrequency()
                 shape = face_utils.shape_to_np(shape)
-                for (x,y) in shape: #For the coordinates saved in shape, extracted from the photo.
-                    cv2.circle (image, (x,y),2, (0, 0, 255),-1)
-                #draw a circle at x,y with a radius of 2, red colour
                 printMeasurements(shape,timeP,timeD)
+        # Write the results back to output location.
+        count = count + 1
+        # If there are no more frames left
+        if (count > (video_length-1)):
+            # Log the time again
+            time_end = time.time()
             # Show the image
-            out.write(image)
-            
-            cv2.imshow("Live feed",image)
-            if cv2.waitKey(delay) & 0xFF == 27:
-                break
-            timeC =(cv2.getTickCount() - startC)/ cv2.getTickFrequency()
-            timesC.append(timeC)
-    file = open(path+"results.txt",'w')
-    printAveragesToFile(file)
-    os.system("clear")
-    print("Saved results and video to /frames directory. Exiting.")
-    file.close()
-    camera.release()
-    out.release()  
-    cv2.destroyAllWindows()
-
-#main
-#Arguments are [period of pictures, in ms][0 for default camera, 2 for secondary (if on laptop)]
-
-if(len(sys.argv) == 5):
-    print('hmm')
-    liveDemo(int(sys.argv[1]),int(sys.argv[2]),int(sys.argv[3]),int(sys.argv[4]))
-else:
-    print("No parameters set, running at 10ms and default camera.")
-    liveDemo(10,0,480,640)
+            file = open(path+"resultsFromFile.txt",'w')
+            printAveragesToFile(file)
+            os.system("clear")
+            print("Saved results and video to /frames directory. Exiting.")
+            file.close()
+            # Release the feed
+            cap.release()
+            # Print stats
+            print ("Done extracting frames.\n%d frames extracted" % count)
+            print ("It took %d seconds forconversion." % (time_end-time_start))
+            break
+input_loc = '/home/zander/CEG4912-3/dddas_ceg4912-4913/ml-python/2023-10-05 17-45-37.mkv'
+output_loc = '/home/zander/CEG4912-3/dddas_ceg4912-4913/ml-python/framesTEST'
+video_to_frames(input_loc,output_loc)

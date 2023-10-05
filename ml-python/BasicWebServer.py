@@ -2,7 +2,12 @@ from flask import Flask,request
 from datetime import datetime
 import statistics
 app = Flask(__name__)
-
+##################################
+#                                #
+#      Command to start Flask    #
+#                                #
+# flask --app BasicWebServer run #
+##################################
 counter = 0
 avMAR = []
 avMOE = []
