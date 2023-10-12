@@ -79,6 +79,7 @@ def video_to_frames(input_loc, output_loc):
             faces = faceDetector.detectMultiScale(grayScale, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30),flags=cv2.CASCADE_SCALE_IMAGE)
             timeD = (cv2.getTickCount() - startTime)/ cv2.getTickFrequency()
             for (x, y, w, h) in faces:
+                print("Face found.")
                 #Grabbing bounding box coordinates for facial detection
                 face = dlib.rectangle(int(x), int(y), int(x + w),int(y + h))
                 startTime = cv2.getTickCount() #Starting time for prediction measurement
