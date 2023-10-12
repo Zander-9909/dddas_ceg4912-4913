@@ -32,6 +32,7 @@ def postMeasurements(shape):
     CIR = fm.eyeCircularity(eye)# Calculate the Eye Circularity from FeatureMeasurement.py
     MOE = fm.mouth_over_eye(eye)# Calculate the Mouth Over Eye ratio (MAR/EAR) from FeatureMeasurement.py
     dict = {
+        "type":"facial",
         "time": str(datetime.now()),
         "MOE": MOE,
         "MAR": MAR,
