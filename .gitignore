@@ -197,3 +197,7 @@ dmypy.json
 # Video files
 *.mp4
 *.mov
+
+# Raspberry Pi libraries
+dlib-raspberrypi/
+opencv-raspberrypi/
