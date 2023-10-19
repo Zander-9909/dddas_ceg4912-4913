@@ -1,9 +1,10 @@
-import  React from "react";    
+import React from "react";
 import { StyleSheet, Text, View, Stack } from "react-native";
 import { Provider } from "react-redux";
 import { store } from './store';
 import HomeScreen from "./screens/HomeScreen";
 import MapScreen from "./screens/MapScreen";
+import AnalyticsScreen from "./screens/AnalyticsScreen";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import 'react-native-gesture-handler';
 import { NavigationContainer } from "@react-navigation/native";
@@ -17,16 +18,23 @@ export default function App() {
       <NavigationContainer>
         <SafeAreaProvider>
           <Stack.Navigator>
-            <Stack.Screen 
-              name='HomeScreen' 
-              component={HomeScreen} 
+            <Stack.Screen
+              name='HomeScreen'
+              component={HomeScreen}
               options={{
                 headerShown: false,
               }}
             />
-            <Stack.Screen 
-              name='MapScreen' 
-              component={MapScreen} 
+            <Stack.Screen
+              name='MapScreen'
+              component={MapScreen}
+              options={{
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name='AnalyticsScreen'
+              component={AnalyticsScreen}
               options={{
                 headerShown: false,
               }}
@@ -34,7 +42,7 @@ export default function App() {
           </Stack.Navigator>
         </SafeAreaProvider>
       </NavigationContainer>
-    </Provider> 
+    </Provider>
   );
 }
 
