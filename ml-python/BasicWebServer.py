@@ -1,6 +1,9 @@
 from flask import Flask,request
 from datetime import datetime
+from KthNeighbour import modelKNNWebServer
 import statistics
+import pandas as pd
+import numpy as np
 app = Flask(__name__)
 ##################################
 #                                #
@@ -9,6 +12,11 @@ app = Flask(__name__)
 # flask --app BasicWebServer run #
 ##################################
 counter = 0
+first20 = False
+features = []
+df_means = 0
+df_std = 0
+
 avMAR = []
 avMOE = []
 avCIR = []
@@ -33,28 +41,56 @@ def process_json():
             global avEAR
             global startTime
             global endTime
+            global first20
+            global df_means
+            global df_std
+
             counter = counter + 1 
             avMOE.append(json.get("MOE"))
             avCIR.append(json.get("CIR"))
             avEAR.append(json.get("EAR"))
             avMAR.append(json.get("MAR"))
+            features.append([json.get("EAR"),json.get("MAR"),json.get("CIR"),json.get("MOE")])
 
             if counter == 1:
                 startTime = json.get("time")
-            elif counter%10 == 0:#server has received 10 packets
+            elif counter%20 == 0 and not first20:#server has received 20 packets
+                first20 = True
                 endTime = json.get("time")
                 counter = 0
-                print("Average of Past 10 Measurements:")
+                print("Stats of the first 20 Measurements:")
                 print("Time range: "+ startTime + " -> "+endTime)
-                print("MAR: "+str(statistics.mean(avMAR)))
-                print("EAR: "+str(statistics.mean(avEAR)))
-                print("CIR: "+str(statistics.mean(avCIR)))
-                print("MOE: "+str(statistics.mean(avMOE)))
+                print("MAR: Mean = "+str(statistics.mean(avMAR)) + ", STD = "+ str(statistics.stdev(avMAR)))
+                print("EAR: Mean = "+str(statistics.mean(avEAR)) + ", STD = "+ str(statistics.stdev(avEAR)))
+                print("CIR: Mean = "+str(statistics.mean(avCIR)) + ", STD = "+ str(statistics.stdev(avCIR)))
+                print("MOE: Mean = "+str(statistics.mean(avMOE)) + ", STD = "+ str(statistics.stdev(avMOE)))
+                
+                features = np.array(features)
+                x = features
+                y = pd.DataFrame(x, columns=["EAR","MAR","Circularity","MOE"])
+                df_means = y.mean(axis=0)
+                df_std = y.std(axis=0)
+
                 avMAR = []
                 avMOE = []
                 avCIR = []
                 avEAR = []
-            return json 
+                result = modelKNNWebServer(json,df_means,df_std)
+            elif counter % 20 and first20:
+                endTime = json.get("time")
+                counter = 0
+                print("Stats of the last 10 Measurements:")
+                print("Time range: "+ startTime + " -> "+endTime)
+                print("MAR: Mean = "+str(statistics.mean(avMAR)) + ", STD = "+ str(statistics.stdev(avMAR)))
+                print("EAR: Mean = "+str(statistics.mean(avEAR)) + ", STD = "+ str(statistics.stdev(avEAR)))
+                print("CIR: Mean = "+str(statistics.mean(avCIR)) + ", STD = "+ str(statistics.stdev(avCIR)))
+                print("MOE: Mean = "+str(statistics.mean(avMOE)) + ", STD = "+ str(statistics.stdev(avMOE)))
+                avMAR = []
+                avMOE = []
+                avCIR = []
+                avEAR = []
+            return result 
+
         elif (json.get("type")=="ULTRAsonic"):
             #do stuff
             return json

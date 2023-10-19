@@ -1,6 +1,9 @@
-import numpy 
+import numpy as np
 import math
 from scipy.spatial import distance
+import cv2
+from imutils import face_utils
+import pandas as pd
 # ^Must install with apt-get 
 
 #defines

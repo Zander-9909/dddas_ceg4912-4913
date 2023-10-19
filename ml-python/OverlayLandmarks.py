@@ -5,7 +5,10 @@ from datetime import datetime
 import sys
 import FeatureMeasurement as fm
 from imutils import face_utils
+import pandas as pd
+import numpy as np
 import VideoThreads as vt
+import KthNeighbour as kth
 import dlib #required for mlxtend to function.
 
 #p = "shape_predictor_68_face_landmarks.dat"
@@ -17,6 +20,8 @@ from mlxtend.image import extract_face_landmarks
 # Function to take in a photo and extract landmarks
 import os
 
+mean,std = 0,0
+featuresTotal = []
 avEAR,avMAR, avCIR, avMOE, timesP, timesD,timesC = [],[],[],[],[],[],[]
 if not os.path.exists('frames'):
     os.mkdir('frames/')
@@ -37,16 +42,43 @@ def printAveragesToFile(file):
     file.write("TTD:\t"+str(round(sum(timesD)/len(timesD),4))+"\t"+str(round(max(timesD),4))+"\t"+str(round(min(timesD),4))+"\n")
     file.write("TTC:\t"+str(round(sum(timesC)/len(timesC),4))+"\t"+str(round(max(timesC),4))+"\t"+str(round(min(timesC),4))+"\n")
 
-def printMeasurements(shape,timeP,timeD):
+def printMeasurements(shape,timeP,timeD,alerting):
+    global mean,std,featuresTotal
+    rString,rColour,prob = None,None,None
     eye = shape[36:68]# Get useful facial landmarks (some are extraneous for our use, so we can ignore them.)
-    avEAR.append(fm.EAR(eye)) # Calculate the Eye Aspect Ratio from FeatureMeasurement.py
-    avMAR.append(fm.MAR(eye))# Calculate Mouth Aspect Ratio from FeatureMeasurement.py
-    avCIR.append(fm.eyeCircularity(eye))# Calculate the Eye Circularity from FeatureMeasurement.py
-    avMOE.append(fm.mouth_over_eye(eye))# Calculate the Mouth Over Eye ratio (MAR/EAR) from FeatureMeasurement.py
+    ear = fm.EAR(eye)
+    mar = fm.MAR(eye)
+    cir = fm.eyeCircularity(eye)
+    moe = fm.mouth_over_eye(eye)
+
+    avEAR.append(ear) # Calculate the Eye Aspect Ratio from FeatureMeasurement.py
+    avMAR.append(mar)# Calculate Mouth Aspect Ratio from FeatureMeasurement.py
+    avCIR.append(cir)# Calculate the Eye Circularity from FeatureMeasurement.py
+    avMOE.append(moe)# Calculate the Mouth Over Eye ratio (MAR/EAR) from FeatureMeasurement.py
+    featuresTotal.append([ear,mar,cir,moe])
     timesD.append(timeD)
     timesP.append(timeP)
-
-    os.system("clear")
+    if(alerting):
+        if len(avEAR) == 20: #Calibrating off of the first 20 frames
+            featureNP = np.array(featuresTotal)
+            x = featureNP
+            y = pd.DataFrame(x, columns=["MOE","EAR","MAR","Circularity"])
+            mean = y.mean(axis=0)
+            std = y.std(axis=0)
+            os.system("clear")
+            print("Calibrating Complete")
+            return None,None
+        elif len(avEAR) > 20:
+            rString,rColour,prob = kth.modelKNNLocal(shape, mean, std)
+            os.system("clear")
+            print(rString + "\n")
+            for i in prob:
+                print(str(i))
+        else:
+            os.system("clear")
+            print("Calibrating\n")
+    if not alerting:
+        os.system("clear")
     print("EAR: "+str(avEAR[len(avEAR)-1])+"\n")
     print("MAR: "+str(avMAR[len(avMAR)-1])+"\n")
     print("EyeCirc: "+str(avCIR[len(avCIR)-1])+"\n")
@@ -54,9 +86,12 @@ def printMeasurements(shape,timeP,timeD):
     print("TTD: "+str(timeD)+"\n")
     print("TTP: "+str(timeP)+"\n")
     print("Press ESC to exit.")
+    return rString,rColour
 
 def liveDemo(delay,camNum,height, width):
-    camera = cv2.VideoCapture("2023-10-05 17-45-37.mkv")
+    camera = cv2.VideoCapture(camNum)
+    fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    out = cv2.VideoWriter(path+'outputMulti.avi', fourcc, 15.0, (640,480))
     
     while True:
         startC = cv2.getTickCount()
@@ -65,7 +100,7 @@ def liveDemo(delay,camNum,height, width):
             image = cv2.resize(image,(width,height))
             grayScale = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)#Make grayscale
             startTime = cv2.getTickCount()
-            faces = faceDetector.detectMultiScale(grayScale, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30),flags=cv2.CASCADE_SCALE_IMAGE)
+            faces = faceDetector.detectMultiScale(grayScale, scaleFactor=1.05, minNeighbors=9, minSize=(30, 30),flags=cv2.CASCADE_SCALE_IMAGE)
             timeD = (cv2.getTickCount() - startTime)/ cv2.getTickFrequency()
             for (x, y, w, h) in faces:
                 #Grabbing bounding box coordinates for facial detection
@@ -77,7 +112,51 @@ def liveDemo(delay,camNum,height, width):
                 for (x,y) in shape: #For the coordinates saved in shape, extracted from the photo.
                     cv2.circle (image, (x,y),2, (0, 0, 255),-1)
                 #draw a circle at x,y with a radius of 2, red colour
-                printMeasurements(shape,timeP,timeD)
+                printMeasurements(shape,timeP,timeD,False)
+            # Show the image
+            out.write(image)
+            
+            cv2.imshow("Live feed",image)
+            if cv2.waitKey(delay) & 0xFF == 27:
+                break
+            timeC =(cv2.getTickCount() - startC)/ cv2.getTickFrequency()
+            timesC.append(timeC)
+    file = open(path+"results.txt",'w')
+    printAveragesToFile(file)
+    os.system("clear")
+    print("Saved results and video to /frames directory. Exiting.")
+    file.close()
+    camera.release()
+    out.release()  
+    cv2.destroyAllWindows()
+
+def liveDemoAlerting(delay,camNum,height, width):
+    camera = cv2.VideoCapture(camNum)
+    fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    out = cv2.VideoWriter(path+'outputMulti.avi', fourcc, 15.0, (640,480))
+    
+    while True:
+        startC = cv2.getTickCount()
+        succ, image = camera.read()
+        if(succ):
+            image = cv2.resize(image,(width,height))
+            grayScale = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)#Make grayscale
+            startTime = cv2.getTickCount()
+            faces = faceDetector.detectMultiScale(grayScale, scaleFactor=1.05, minNeighbors=9, minSize=(40, 40),flags=cv2.CASCADE_SCALE_IMAGE)
+            timeD = (cv2.getTickCount() - startTime)/ cv2.getTickFrequency()
+            for (x, y, w, h) in faces:
+                #Grabbing bounding box coordinates for facial detection
+                face = dlib.rectangle(int(x), int(y), int(x + w),int(y + h))
+                startTime = cv2.getTickCount() #Starting time for prediction measurement
+                shape = facePredictor(grayScale, face)
+                timeP=(cv2.getTickCount() - startTime)/ cv2.getTickFrequency()
+                shape = face_utils.shape_to_np(shape)
+                for (x,y) in shape: #For the coordinates saved in shape, extracted from the photo.
+                    cv2.circle (image, (x,y),2, (0, 0, 255),-1)
+                #draw a circle at x,y with a radius of 2, red colour
+                resultS,tColour = printMeasurements(shape,timeP,timeD,True)
+                cv2.putText(image,resultS,(300, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, tColour, 2)
+                #cv2.putText(image,str(rProb),(200, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, tColour, 2)
             # Show the image
             out.write(image)
             
@@ -101,6 +180,10 @@ def liveDemo(delay,camNum,height, width):
 if(len(sys.argv) == 5):
     print('hmm')
     liveDemo(int(sys.argv[1]),int(sys.argv[2]),int(sys.argv[3]),int(sys.argv[4]))
+elif(len(sys.argv)==2):
+    if(str(sys.argv[1])=="alert"):
+        print("Running with alerting, at 10ms and default camera.")
+        liveDemoAlerting(10,0,480,640)
 else:
-    print("No parameters set, running at 10ms and default camera.")
+    print("Not running with alerting, running at 10ms and default camera.")
     liveDemo(10,0,480,640)
