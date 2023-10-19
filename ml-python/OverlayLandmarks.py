@@ -71,9 +71,11 @@ def printMeasurements(shape,timeP,timeD,alerting):
         elif len(avEAR) > 20:
             rString,rColour,prob = kth.modelKNNLocal(shape, mean, std)
             os.system("clear")
-            print(rString + "\n")
+            print(rString + "\nProbabilities\n")
+            print("Not Drowsy - Maybe Drowsy - Drowsy")
             for i in prob:
-                print(str(i))
+                print(str(i)+" ")
+            print()
         else:
             os.system("clear")
             print("Calibrating\n")
@@ -156,7 +158,6 @@ def liveDemoAlerting(delay,camNum,height, width):
                 #draw a circle at x,y with a radius of 2, red colour
                 resultS,tColour = printMeasurements(shape,timeP,timeD,True)
                 cv2.putText(image,resultS,(300, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, tColour, 2)
-                #cv2.putText(image,str(rProb),(200, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, tColour, 2)
             # Show the image
             out.write(image)
             

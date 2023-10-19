@@ -24,7 +24,7 @@ def average(y_pred):
         y_pred[i] = 0
   return y_pred
 
-df = pd.read_csv('totalwithmaininfo.csv',sep=',')
+df = pd.read_csv('dataset/totalwithmaininfo.csv',sep=',')
 #df = df.drop(df.columns[0])
 
 participants = set(df.Participant)
@@ -84,7 +84,7 @@ def modelKNNLocal(landmarks,mean,std):
     if Result == 2:
         Result_String = "Drowsy"
         fontColour = (0,0,255)
-    elif Result == 1:
+    elif Result >= 1:
         Result_String = "Possibly Drowsy"
         fontColour = (100,100,255)
     else:
