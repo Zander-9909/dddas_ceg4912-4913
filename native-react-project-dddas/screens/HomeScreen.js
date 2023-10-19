@@ -5,7 +5,7 @@ import NavOptions from "../components/NavOptions";
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { GOOGLE_MAPS_APIKEY } from "@env";
 import { useDispatch } from "react-redux";
-import { setOrgin, setDestination } from "../slices/navSlice";
+import { setOrigin, setDestination } from "../slices/navSlice";
 
 const HomeScreen = () => {
     const dispatch = useDispatch();
@@ -37,7 +37,7 @@ const HomeScreen = () => {
                         console.log(data);
                         console.log(details);
                         dispatch(
-                            setOrgin({
+                            setOrigin({
                                 location: details.geometry.location,
                                 description: data.description,
                             })
@@ -51,7 +51,7 @@ const HomeScreen = () => {
                     //min length of place
                     minLength={2}
                     query = {{
-                        key: GOOGLE_MAPS_APIKEY,
+                        key: {GOOGLE_MAPS_APIKEY},
                         language: 'en',
                     }} 
                     nearbyPlacesAPI="GooglePlacesSearch"
