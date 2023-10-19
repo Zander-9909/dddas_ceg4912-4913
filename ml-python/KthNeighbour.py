@@ -18,8 +18,10 @@ def average(y_pred):
       pass
     else: 
       average = float(y_pred[i-1] +  y_pred[i] + y_pred[i+1])/3
-      if average >= 0.5:
-        y_pred[i] = 1
+      if average >= 1.3:
+        y_pred[i] = 2
+      elif average >= 0.7:
+         y_pred[i] = 1
       else:
         y_pred[i] = 0
   return y_pred
@@ -51,16 +53,24 @@ acc3_list = []
 f1_score3_list = []
 roc_3_list = []
 
+'''for i in range(1, 45):
+    neigh = KNeighborsClassifier(n_neighbors=i)
+    neigh.fit(X_train, y_train) 
+    pred_KN = neigh.predict(X_test)
+    pred_KN = average(pred_KN)
+    y_score_3 = neigh.predict_proba(X_test)[:,1]
+    acc3_list.append(accuracy_score(y_test, pred_KN))
+    roc_3_list.append(metrics.roc_auc_score(y_test, y_score_3))
+neigh = KNeighborsClassifier(n_neighbors=acc3_list.index(max(acc3_list))+1)'''
 
 #9 was the highest
-neigh = KNeighborsClassifier(9)
-#print(f"Neighbors: {neigh.get_params()['n_neighbors']}")
+neigh = KNeighborsClassifier(40)
+print(f"Neighbors: {neigh.get_params()['n_neighbors']}")
 neigh.fit(X_train, y_train) 
 
-'''pred_KN = neigh.predict(X_test)
-pred_KN = average(pred_KN)
+pred_KN = neigh.predict(X_test)
 acc3 = accuracy_score(y_test, pred_KN)
-print(str(acc3*100)+"%")'''
+print(str(acc3*100)+"%")
 
 def modelKNNLocal(landmarks,mean,std):
     """Returns features and classification result"""
@@ -79,13 +89,13 @@ def modelKNNLocal(landmarks,mean,std):
     df["Circularity_N"] = (df["Circularity"] - mean["Circularity"]) / std["Circularity"]
     df["MOE_N"] = (df["MOE"] - mean["MOE"]) / std["MOE"]
 
-    Result = neigh.predict(df)  
+    Result = neigh.predict(df)
     prob = neigh.predict_proba(df)
     if Result == 2:
         Result_String = "Drowsy"
         fontColour = (0,0,255)
-    elif Result >= 1:
-        Result_String = "Possibly Drowsy"
+    elif Result == 1:
+        Result_String = "Slightly Drowsy"
         fontColour = (100,100,255)
     else:
         Result_String = "Not Drowsy"
@@ -114,9 +124,11 @@ def modelKNNWebServer(json,mean,std):
     df["Circularity_N"] = (df["Circularity"] - mean.get("CIR")) / std.get("CIR")
     df["MOE_N"] = (df["MOE"] - mean.get("MOE")) / std.get("MOE")'''
     
-    Result = neigh.predict(df)  
-    if Result == 1:
+    Result = average(neigh.predict(df))
+    if Result == 2:
         Result_String = "Drowsy"
+    elif Result == 1:
+        Result_String = "Slightly Drowsy"
     else:
         Result_String = "Alert"
     

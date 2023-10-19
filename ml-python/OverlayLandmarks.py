@@ -1,15 +1,18 @@
 #Using the mlxtend python library, we can take a grayscale photo and
 #extract certain facial landmarks from it, and overlay them onto the photo
 import cv2
-from datetime import datetime
 import sys
 import FeatureMeasurement as fm
 from imutils import face_utils
 import pandas as pd
 import numpy as np
-import VideoThreads as vt
+import warnings
 import KthNeighbour as kth
 import dlib #required for mlxtend to function.
+
+#####################################
+warnings.filterwarnings("ignore")#### This is bad but it cleans up output
+#####################################
 
 #p = "shape_predictor_68_face_landmarks.dat"
 p = "models/shape_predictor_gtx.dat"
@@ -72,7 +75,7 @@ def printMeasurements(shape,timeP,timeD,alerting):
             rString,rColour,prob = kth.modelKNNLocal(shape, mean, std)
             os.system("clear")
             print(rString + "\nProbabilities\n")
-            print("Not Drowsy - Maybe Drowsy - Drowsy")
+            print("Not Drowsy - Slightly Drowsy - Drowsy")
             for i in prob:
                 print(str(i)+" ")
             print()
@@ -93,7 +96,7 @@ def printMeasurements(shape,timeP,timeD,alerting):
 def liveDemo(delay,camNum,height, width):
     camera = cv2.VideoCapture(camNum)
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    out = cv2.VideoWriter(path+'outputMulti.avi', fourcc, 15.0, (640,480))
+    out = cv2.VideoWriter(path+'outputVideoNoAlert.mp4', fourcc, 15.0, (640,480))
     
     while True:
         startC = cv2.getTickCount()
@@ -135,7 +138,7 @@ def liveDemo(delay,camNum,height, width):
 def liveDemoAlerting(delay,camNum,height, width):
     camera = cv2.VideoCapture(camNum)
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    out = cv2.VideoWriter(path+'outputMulti.avi', fourcc, 15.0, (640,480))
+    out = cv2.VideoWriter(path+'outputVideoAlert.mp4', fourcc, 15.0, (640,480))
     
     while True:
         startC = cv2.getTickCount()
