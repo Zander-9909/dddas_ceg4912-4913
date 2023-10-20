@@ -109,8 +109,8 @@ def modelKNNWebServer(json,mean,std):
     mar = json.get("MAR")
     moe = json.get("MOE")
     cir = json.get("CIR")
-    mean = json.get("MEAN")
-    std = json.get("STD")
+    mean = pd.Dataframe(json.get("MEAN"))
+    std = pd.Dataframe(json.get("STD"))
     df = features.append({"EAR":ear,"MAR": mar,"Circularity": cir,"MOE": moe},ignore_index=True)
 
     # Normalisation
@@ -118,18 +118,13 @@ def modelKNNWebServer(json,mean,std):
     df["MAR_N"] = (df["MAR"] - mean["MAR"]) / std["MAR"]
     df["Circularity_N"] = (df["Circularity"] - mean["Circularity"]) / std["Circularity"]
     df["MOE_N"] = (df["MOE"] - mean["MOE"]) / std["MOE"]
-
-    '''df["EAR_N"] = (df["EAR"] - mean.get("EAR")) / std.get("EAR")
-    df["MAR_N"] = (df["MAR"] - mean.get("MAR")) / std.get("MAR")
-    df["Circularity_N"] = (df["Circularity"] - mean.get("CIR")) / std.get("CIR")
-    df["MOE_N"] = (df["MOE"] - mean.get("MOE")) / std.get("MOE")'''
     
-    Result = average(neigh.predict(df))
+    Result = neigh.predict(df)
+    prob = neigh.predict_proba(df)
     if Result == 2:
         Result_String = "Drowsy"
     elif Result == 1:
         Result_String = "Slightly Drowsy"
     else:
-        Result_String = "Alert"
-    
-    return Result_String
+        Result_String = "Not Drowsy"
+    return Result_String, prob
