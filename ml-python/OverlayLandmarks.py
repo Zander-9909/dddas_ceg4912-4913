@@ -105,7 +105,7 @@ def liveDemo(delay,camNum,height, width):
             image = cv2.resize(image,(width,height))
             grayScale = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)#Make grayscale
             startTime = cv2.getTickCount()
-            faces = faceDetector.detectMultiScale(grayScale, scaleFactor=1.05, minNeighbors=9, minSize=(30, 30),flags=cv2.CASCADE_SCALE_IMAGE)
+            faces = faceDetector.detectMultiScale(grayScale, scaleFactor=1.1, minNeighbors=9, minSize=(35, 35),flags=cv2.CASCADE_SCALE_IMAGE)
             timeD = (cv2.getTickCount() - startTime)/ cv2.getTickFrequency()
             for (x, y, w, h) in faces:
                 #Grabbing bounding box coordinates for facial detection

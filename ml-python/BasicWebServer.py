@@ -71,7 +71,8 @@ def process_json():
                 std = y.std(axis=0)
                 result.update({"mean":mean})
                 result.update({"std":mean})
-            elif counter % 21 ==0 and first20
+            elif counter % 21 ==0 and first20:
+                
             return result 
 
         elif (json.get("type")=="ULTRAsonic"):
