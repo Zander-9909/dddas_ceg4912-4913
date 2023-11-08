@@ -14,7 +14,7 @@ app = Flask(__name__)
 ##################################
 counter = 0
 first20 = False
-features = []
+featuresRAW = []
 mean = 0
 std = 0
 
@@ -29,50 +29,54 @@ endTime = ""
 def hello_world():
     return "<p>Hello, World!</p>"
 
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    if request.method == 'POST':
+        print("Data received from Webhook is: ", request.json)
+
+        return "Webhook received!"
+
 @app.route('/data', methods=['POST'])
 def process_json():
     content_type = request.headers.get('Content-Type')
     if (content_type == 'application/json'):
         json = dict(request.json)
         if(json.get("type")=="facial"):
-            global avMAR,avMOE,counter,avCIR,avEAR,startTime,endTime,mean,first20,std
+            global avMAR,avMOE,counter,avCIR,avEAR,startTime,endTime,mean,first20,std,featuresRAW
 
             counter = counter + 1 
-            #avMOE.append(json.get("MOE"))
-            #avCIR.append(json.get("CIR"))
-            #avEAR.append(json.get("EAR"))
-            #avMAR.append(json.get("MAR"))
-            features.append([json.get("EAR"),json.get("MAR"),json.get("CIR"),json.get("MOE")])
-            result = {"mess":"Got a packet"}
+            result = {"mess":"****Received packet****"}
+            featuresRAW.append([json.get("MOE"),json.get("EAR"),json.get("MAR"),json.get("CIR")])
             if counter == 1:
                 startTime = json.get("time")
-                result = {"mess":"Received first packet OK"}
-            elif counter%21 == 0 and not first20:#server has received 20 packets
+            elif counter % 11 ==0 and first20: #every 10 packets, do ML
                 endTime = json.get("time")
+                result={}
+                counter = 0
+                featureNP = np.array(featuresRAW)
+                x = featureNP
+                y = pd.DataFrame(x, columns=["MOE","EAR","MAR","Circularity"])
+                dictR = {"MOE":mean.get("MOE"),"EAR":mean.get("EAR"),"MAR":mean.get("MAR"),"CIR":mean.get("Circularity")}
+                rString,rProb = modelKNNWebServer(dictR, mean, std)
+                result.update({"mess":rString})
+                result.update({"prob":str(rProb)})
+                featuresRAW = []
+            elif counter%21 == 0 and not first20:#server has received the first 20 packets
+                endTime = json.get("time")
+                result={}
                 counter = 0
                 first20 = True
-                print("Stats of the last 20 Measurements:")
-                print("Time range: "+ startTime + " -> "+endTime)
-                '''print("MAR: Mean = "+str(statistics.mean(avMAR)) + ", STD = "+ str(statistics.stdev(avMAR)))
-                print("EAR: Mean = "+str(statistics.mean(avEAR)) + ", STD = "+ str(statistics.stdev(avEAR)))
-                print("CIR: Mean = "+str(statistics.mean(avCIR)) + ", STD = "+ str(statistics.stdev(avCIR)))
-                print("MOE: Mean = "+str(statistics.mean(avMOE)) + ", STD = "+ str(statistics.stdev(avMOE)))
-
-                result = {"mess":"****Received 20 packets OK****"}
-                result.update ({"EAR": "Mean = "+str(statistics.mean(avEAR)) + ", STD = "+ str(statistics.stdev(avEAR))})
-                result.update ({"CIR": "Mean = "+str(statistics.mean(avCIR)) + ", STD = "+ str(statistics.stdev(avCIR))})
-                result.update ({"MOE": "Mean = "+str(statistics.mean(avMOE)) + ", STD = "+ str(statistics.stdev(avMOE))})
-                result.update ({"MAR": "Mean = "+str(statistics.mean(avMAR)) + ", STD = "+ str(statistics.stdev(avMAR))})'''
-                result = {"mess":"****Received 20 Packets OK****"}
-                featureNP = np.array(features)
+                featureNP = np.array(featuresRAW)
                 x = featureNP
                 y = pd.DataFrame(x, columns=["MOE","EAR","MAR","Circularity"])
                 mean = y.mean(axis=0)
                 std = y.std(axis=0)
-                result.update({"mean":mean})
-                result.update({"std":mean})
-            elif counter % 21 ==0 and first20:
-                
+
+                dictR = {"MOE":mean.get("MOE"),"EAR":mean.get("EAR"),"MAR":mean.get("MAR"),"CIR":mean.get("Circularity")}
+                rString,rProb = modelKNNWebServer(dictR, mean, std)
+                result.update({"mess":rString})
+                result.update({"prob":str(rProb)})
+                featuresRAW = []
             return result 
 
         elif (json.get("type")=="ULTRAsonic"):

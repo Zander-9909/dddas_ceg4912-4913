@@ -33,21 +33,21 @@ def postMeasurements(shape):
     MAR = fm.MAR(eye)# Calculate Mouth Aspect Ratio from FeatureMeasurement.py
     CIR = fm.eyeCircularity(eye)# Calculate the Eye Circularity from FeatureMeasurement.py
     MOE = fm.mouth_over_eye(eye)# Calculate the Mouth Over Eye ratio (MAR/EAR) from FeatureMeasurement.py
-    dict = {
+    dictP = {
         "type":"facial",
         "time": str(datetime.now()),
         "MOE": MOE,
         "MAR": MAR,
         "EAR": EAR,
         "CIR": CIR}
-    request = requests.post("http://127.0.0.1:5000/data", json=dict)
+    request = requests.post("http://127.0.0.1:5000/data", json=dictP)
     file.write(str(request.json())+"\n")
-    for entry in request.json():
+    for entry in dict(request.json()):
         if(entry == "mess"):
-            if(request.json().get(entry) != "Got a packet"):
-                print(request.json().get(entry)+"\n")
+            if(dict(request.json()).get(entry) != "****Received packet****"):
+                print(dict(request.json()).get(entry)+"\n")
         else:
-            print(entry + ": "+request.json().get(entry)+"\n")
+            print(entry + ": "+dict(request.json()).get(entry)+"\n")
 
 
 

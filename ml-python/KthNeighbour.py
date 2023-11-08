@@ -103,16 +103,15 @@ def modelKNNLocal(landmarks,mean,std):
     return Result_String, fontColour,prob
 
 def modelKNNWebServer(json,mean,std):
+    
+    
     """Returns features and classification result"""
-    features = pd.DataFrame(columns=["EAR","MAR","Circularity","MOE"])
+    features = pd.DataFrame(columns=["MOE","EAR","MAR","Circularity"])
     ear = json.get("EAR")
     mar = json.get("MAR")
     moe = json.get("MOE")
     cir = json.get("CIR")
-    mean = pd.Dataframe(json.get("MEAN"))
-    std = pd.Dataframe(json.get("STD"))
-    df = features.append({"EAR":ear,"MAR": mar,"Circularity": cir,"MOE": moe},ignore_index=True)
-
+    df = features.append({"MOE":moe,"EAR": ear,"MAR": mar,"Circularity": cir},ignore_index=True)
     # Normalisation
     df["EAR_N"] = (df["EAR"] - mean["EAR"]) / std["EAR"]
     df["MAR_N"] = (df["MAR"] - mean["MAR"]) / std["MAR"]
@@ -127,4 +126,4 @@ def modelKNNWebServer(json,mean,std):
         Result_String = "Slightly Drowsy"
     else:
         Result_String = "Not Drowsy"
-    return Result_String, prob
+    return Result_String,prob
