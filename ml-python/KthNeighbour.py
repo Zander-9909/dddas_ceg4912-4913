@@ -9,6 +9,8 @@ import sklearn.metrics as metrics
 from sklearn.metrics import accuracy_score
 import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
+import warnings
+warnings.filterwarnings("ignore","The frame.append method is deprecated")
 
 # This is taken from https://github.com/sandyying/APM-Drowsiness-Detection/blob/master/Live%20Demo.ipynb
 # and https://github.com/hackenjoe/Advanced_Drowsiness_Detection/blob/main/drowsiness_detection.ipynb
@@ -63,7 +65,7 @@ roc_3_list = []
     roc_3_list.append(metrics.roc_auc_score(y_test, y_score_3))
 neigh = KNeighborsClassifier(n_neighbors=acc3_list.index(max(acc3_list))+1)'''
 
-#9 was the highest
+# 40 was the highest
 neigh = KNeighborsClassifier(40)
 print(f"Neighbors: {neigh.get_params()['n_neighbors']}")
 neigh.fit(X_train, y_train) 
@@ -80,7 +82,7 @@ def modelKNNLocal(landmarks,mean,std):
     ear = fm.EAR(eye)
     mar = fm.MAR(eye)
     moe = fm.mouth_over_eye(eye)
-    cir = fm.mouth_over_eye(eye)
+    cir = fm.eyeCircularity(eye)
     df = features.append({"MOE":moe,"EAR": ear,"MAR": mar,"Circularity": cir},ignore_index=True)
 
     # Normalisation
@@ -103,8 +105,6 @@ def modelKNNLocal(landmarks,mean,std):
     return Result_String, fontColour,prob
 
 def modelKNNWebServer(json,mean,std):
-    
-    
     """Returns features and classification result"""
     features = pd.DataFrame(columns=["MOE","EAR","MAR","Circularity"])
     ear = json.get("EAR")

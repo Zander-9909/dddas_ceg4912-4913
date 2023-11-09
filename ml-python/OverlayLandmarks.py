@@ -58,7 +58,7 @@ def printMeasurements(shape,timeP,timeD,alerting):
     avMAR.append(mar)# Calculate Mouth Aspect Ratio from FeatureMeasurement.py
     avCIR.append(cir)# Calculate the Eye Circularity from FeatureMeasurement.py
     avMOE.append(moe)# Calculate the Mouth Over Eye ratio (MAR/EAR) from FeatureMeasurement.py
-    featuresTotal.append([moe,ear,mar,cir])
+    if(len(avEAR)<=20 and alerting):featuresTotal.append([moe,ear,mar,cir])
     timesD.append(timeD)
     timesP.append(timeP)
     if(alerting):

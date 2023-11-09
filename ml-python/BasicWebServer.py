@@ -56,10 +56,13 @@ def process_json():
                 featureNP = np.array(featuresRAW)
                 x = featureNP
                 y = pd.DataFrame(x, columns=["MOE","EAR","MAR","Circularity"])
-                dictR = {"MOE":mean.get("MOE"),"EAR":mean.get("EAR"),"MAR":mean.get("MAR"),"CIR":mean.get("Circularity")}
+                avgMeasurements = y.mean(axis=0)
+
+                dictR = {"MOE":avgMeasurements.get("MOE"),"EAR":avgMeasurements.get("EAR"),"MAR":avgMeasurements.get("MAR"),"CIR":avgMeasurements.get("Circularity")}
                 rString,rProb = modelKNNWebServer(dictR, mean, std)
                 result.update({"mess":rString})
                 result.update({"prob":str(rProb)})
+                print(dictR)
                 featuresRAW = []
             elif counter%21 == 0 and not first20:#server has received the first 20 packets
                 endTime = json.get("time")
