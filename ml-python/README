@@ -17,3 +17,4 @@ sudo python3 OverlayLandmarks.py arg1 arg2
 
 arg1 is the period for picture taking, in ms. 
 arg2 is to select which camera to use (if a device has multiple). 0 is for the default, 2 for a secondary one. 
+

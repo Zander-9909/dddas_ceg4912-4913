@@ -1,3 +1,9 @@
 [submodule "dlib"]
 	path = dlib
 	url = https://github.com/davisking/dlib
+[submodule "opencv-raspberrypi"]
+	path = opencv-raspberrypi
+	url = https://github.com/prepkg/opencv-raspberrypi
+[submodule "dlib-raspberrypi"]
+	path = dlib-raspberrypi
+	url = https://github.com/prepkg/dlib-raspberrypi
