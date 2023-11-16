@@ -1,17 +1,18 @@
 from flask import Flask,request
+from flask import jsonify
 from datetime import datetime
 from KthNeighbour import modelKNNWebServer
 import statistics
 import pandas as pd
 import numpy as np
 app = Flask(__name__)
-##################################
-#                                #
-#      Command to start Flask    #
-#                                #
-# flask --app BasicWebServer run #
-#                                #
-##################################
+########################################################
+#                                                      #
+#      Command to start Flask                          #
+#                                                      #
+# flask --app BasicWebServer run --host=100.72.37.45   #
+#                                                      #
+########################################################
 counter = 0
 first20 = False
 featuresRAW = []
@@ -25,16 +26,26 @@ avEAR = []
 startTime = ""
 endTime = ""
 
+if __name__ == '__main__':
+    app.run(host="0.0.0.0", port=5000)
+
 @app.route("/")
 def hello_world():
     return "<p>Hello, World!</p>"
 
-@app.route('/webhook', methods=['POST'])
+@app.route('/webhook', methods=['GET'])
 def webhook():
-    if request.method == 'POST':
-        print("Data received from Webhook is: ", request.json)
+    if request.method == 'GET':
+        print("'GET' webhook received")
+        dictR = {
+        'status': 200,
+        'message': 'OK',
+        'scores': "1-0 for DDDAS"
+        }
+        returnVal = jsonify(dictR)
+        returnVal.status_code = 200
 
-        return "Webhook received!"
+        return returnVal
 
 @app.route('/data', methods=['POST'])
 def process_json():
