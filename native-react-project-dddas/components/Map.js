@@ -13,13 +13,15 @@ const Map = () => {
     const mapRef = useRef(null);
     //updates when orgin or destination is changed
     useEffect(() => {
-        // Don't run code if nothing has been changed
-        if (!origin || !destination) return;
-        //Zoom to the markers
-        mapRef.current.fitToSuppliedMarkers(["origin", "destination"], {
-            edgePadding: {top: 50, right: 50, bottom: 50, left:50},
-         });
-    }, [origin,destination]);
+        if (!origin || !destination || !mapRef.current) {
+            return;
+        }
+        // This will zoom out the map to make sure all markers are visible
+        mapRef.current.fitToCoordinates( [{ latitude: origin.location.lat, longitude: origin.location.lng }, 
+            { latitude: destination.location.lat, longitude: destination.location.lng }] , { 
+            edgePadding: { top: 50, right: 50, bottom: 50, left: 50 }, animated: true,
+        });
+    }, [origin, destination]);
 
   return (
     <MapView
@@ -27,10 +29,10 @@ const Map = () => {
         style={tw`flex-1`}
         mapType="mutedStandard"
         initialRegion={{
-            latitude: origin.location.lat,
-            longitude: origin.location.lng,
-            latitudeDelta: 0.005,
-            longitudeDelta: 0.005,
+            latitude: origin?.location.lat || 0,
+            longitude: origin?.location.lng || 0,
+            latitudeDelta: 0.05,
+            longitudeDelta: 0.05,
         }}
     >
         {origin && destination &&(
@@ -60,7 +62,7 @@ const Map = () => {
                     longitude: destination.location.lng,
                 }}
                 title ="destination"
-                description={origin.description}
+                description={destination.description}
                 identifier='destination'
             />
         )}

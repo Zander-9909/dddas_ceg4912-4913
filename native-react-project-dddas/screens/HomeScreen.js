@@ -2,11 +2,12 @@ import React from "react";
 import { StyleSheet, Text, View, SafeAreaView, Image } from "react-native";
 import tw from 'tailwind-react-native-classnames';
 import NavOptions from "../components/NavOptions";
+import NavFavorites from "../components/NavFavorites";
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { GOOGLE_MAPS_APIKEY } from "@env";
 import { useDispatch } from "react-redux";
 import { setOrigin, setDestination } from "../slices/navSlice";
-
+import axios from 'axios';
 const HomeScreen = () => {
     const dispatch = useDispatch();
 
@@ -34,8 +35,6 @@ const HomeScreen = () => {
                         },
                     }}
                     onPress={(data, details = null) => {
-                        console.log(data);
-                        console.log(details);
                         dispatch(
                             setOrigin({
                                 location: details.geometry.location,
@@ -43,6 +42,12 @@ const HomeScreen = () => {
                             })
                         );
                         dispatch(setDestination(null))
+                        const baseUrl = 'http://100.72.37.45:5000';
+
+                        // Invoking the get method to perform a GET request
+                        axios.get(`${baseUrl}/webhook`).then((response) => {
+                        console.log(response.data);
+                    });
                     }}
                     fetchDetails = {true}
                     returnKeyType = {"search"}
@@ -51,7 +56,7 @@ const HomeScreen = () => {
                     //min length of place
                     minLength={2}
                     query = {{
-                        key: {GOOGLE_MAPS_APIKEY},
+                        key: GOOGLE_MAPS_APIKEY,
                         language: 'en',
                     }} 
                     nearbyPlacesAPI="GooglePlacesSearch"
@@ -59,6 +64,7 @@ const HomeScreen = () => {
                     debounce = {400}
                 />
                 <NavOptions/>
+                <NavFavorites />
             </View>
         </SafeAreaView>
     );
