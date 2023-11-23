@@ -2,8 +2,9 @@ from flask import Flask,request
 from flask import jsonify
 from datetime import datetime
 from KthNeighbour import modelKNNWebServer
-import statistics
+from queue import Queue 
 import pandas as pd
+from queue import Queue
 import numpy as np
 app = Flask(__name__)
 ########################################################
@@ -18,6 +19,9 @@ first20 = False
 featuresRAW = []
 mean = 0
 std = 0
+
+detectionResults = Queue(maxsize=10)
+heartRates = Queue(maxsize=10)
 
 avMAR = []
 avMOE = []
@@ -36,11 +40,11 @@ def hello_world():
 @app.route('/webhook', methods=['GET'])
 def webhook():
     if request.method == 'GET':
+        global detectionResults,heartRates
         print("'GET' webhook received")
         dictR = {
-        'status': 200,
-        'message': 'OK',
-        'scores': "1-0 for DDDAS"
+        'results': list(detectionResults.queue),
+        'heartrates': list(heartRates.queue)
         }
         returnVal = jsonify(dictR)
         returnVal.status_code = 200
@@ -53,7 +57,7 @@ def process_json():
     if (content_type == 'application/json'):
         json = dict(request.json)
         if(json.get("type")=="facial"):
-            global avMAR,avMOE,counter,avCIR,avEAR,startTime,endTime,mean,first20,std,featuresRAW
+            global avMAR,avMOE,counter,avCIR,avEAR,startTime,endTime,mean,first20,std,featuresRAW,detectionResults
 
             counter = counter + 1 
             result = {"mess":"****Received packet****"}
@@ -90,11 +94,26 @@ def process_json():
                 rString,rProb = modelKNNWebServer(dictR, mean, std)
                 result.update({"mess":rString})
                 result.update({"prob":str(rProb)})
+
+                detectionResults.put(rString)
+                
                 featuresRAW = []
             return result 
-
-        elif (json.get("type")=="ULTRAsonic"):
-            #do stuff
-            return json
+        elif (json.get("type")=="bpm"):
+            print(json)
+            if not heartRates.full():
+                heartRates.put(json.get("heartrate"))
+            else:
+                heartRates.get()
+                heartRates.put(json.get("heartrate"))
+            dictR = {
+            'rumble':False
+            }
+            
+            if((sum(list(heartRates.queue)) / len(list(heartRates.queue))) <=70): #or str(max(set(list(detectionResults)), key=list(detectionResults).count()))=="Drowsy"
+                dictR.update({'rumble':True})
+            returnVal = jsonify(dictR)
+            returnVal.status_code = 200
+            return returnVal
     else:
         return "<p>Incorrect Datatype<p>"
