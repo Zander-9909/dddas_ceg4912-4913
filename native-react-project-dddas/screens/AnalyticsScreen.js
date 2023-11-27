@@ -2,38 +2,66 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, Dimensions } from 'react-native';
 import { PieChart, LineChart } from 'react-native-chart-kit';
 import axios from 'axios';
+// import { Audio } from 'expo-av';
 
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
 
+
+// useEffect(() => {
+//   loadSound();
+//   return sound
+//     ? () => {
+//         sound.unloadAsync();
+//       }
+//     : undefined;
+// }, []);
+
+// async function loadSound() {
+//   const { sound } = await Audio.Sound.createAsync(
+//     require('C:\Users\downt\Documents\GitHub\dddas_ceg4912-4913\native-react-project-dddas\alarm.mp3')
+//   );
+//   setSound(sound);
+// }
+// async function playSound() {
+//   if (sound) {
+//     await sound.setVolumeAsync(0.2); // Maximum volume
+//     await sound.playAsync();
+//   }
+// }
+
 const AnalyticsScreen = () => {
   // State for Line Chart
-  const [data, setData] = useState([1, 5, 8]);
+  const [data, setData] = useState([0]);
 
   // State for Pie Chart
   const [pieChartData, setPieChartData] = useState([
-    { name: 'Alert', population: 0, color: 'green', legendFontColor: '#7F7F7F', legendFontSize: 15 },
-    { name: 'A Little Sleepy', population: 0, color: 'yellow', legendFontColor: '#7F7F7F', legendFontSize: 15 },
-    { name: 'Very Sleepy', population: 0, color: 'red', legendFontColor: '#7F7F7F', legendFontSize: 15 },
+    { name: 'Not Drowsy', population: 0, color: 'green', legendFontColor: '#7F7F7F', legendFontSize: 15 },
+    { name: 'Slightly Drowsy', population: 0, color: 'yellow', legendFontColor: '#7F7F7F', legendFontSize: 15 },
+    { name: 'Drowsy', population: 0, color: 'red', legendFontColor: '#7F7F7F', legendFontSize: 15 },
   ]);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const baseUrl = 'https://reqres.in';
-      axios.get(`${baseUrl}/api/users/1`).then((response) => {
+      axios.get(`http://100.72.37.45:5000/webhook`).then((response) => {
         console.log(response.data);
+        const newValue = response.data.heartrate
+        setData(currentData => [...currentData, newValue].slice(-11));
+        const newData = [...pieChartData];
+        newData[response.data.results].population += 1;
+        setPieChartData(newData);
       });
-      const newValue = Math.floor(Math.random() * 100) + 1;
-      setData(currentData => [...currentData, newValue]);
+      //playSound();
       
-      const randomChoice = Math.floor(Math.random() * 3);
-      const newData = [...pieChartData];
-      newData[randomChoice].population += 1;
-      setPieChartData(newData);
-    }, 10000); // Update interval for both charts
+      // const randomChoice = Math.floor(Math.random() * 3);
+      // const newData = [...pieChartData];
+      // newData[randomChoice].population += 1;
+      // setPieChartData(newData);
+    }, 1000); // Update interval for both charts
 
     return () => clearInterval(interval);
   }, [pieChartData]);
+  //[pieChartData, sound]);
 
   const lineChartData = {
     labels: data.map((_, index) => String(index)),
@@ -60,7 +88,7 @@ const AnalyticsScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Sleepiness Levels</Text>
+      <Text style={styles.header}>Drowsiness Levels</Text>
       <PieChart
         data={pieChartData}
         width={screenWidth}
