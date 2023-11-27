@@ -200,5 +200,5 @@ dmypy.json
 *.mov
 
 # Raspberry Pi libraries
-dlib-raspberrypi/
-opencv-raspberrypi/
+./dlib-raspberrypi/
+./opencv-raspberrypi/
