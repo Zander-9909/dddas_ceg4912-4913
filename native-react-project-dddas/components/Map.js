@@ -6,6 +6,48 @@ import { useSelector } from 'react-redux';
 import { selectDestination, selectOrigin } from '../slices/navSlice';
 import MapViewDirections from 'react-native-maps-directions';
 import { GOOGLE_MAPS_APIKEY } from "@env";
+
+const fetchRestStopsAlongRoute = async (origin, destination) => {
+    try {
+      const directionResponse = await fetch(
+        `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}&key=${GOOGLE_MAPS_API_KEY}`
+      );
+      const directionData = await directionResponse.json();
+  
+      if (directionData.routes.length > 0) {
+        const route = directionData.routes[0];
+        const waypoints = route.legs[0].steps
+          .filter(step => step.travel_mode === 'DRIVING')
+          .map(step => ({
+            latitude: step.end_location.lat,
+            longitude: step.end_location.lng,
+          }));
+  
+        const restStops = await Promise.all(
+          waypoints.map(async waypoint => {
+            try {
+              const placesResponse = await fetch(
+                `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${waypoint.latitude},${waypoint.longitude}&radius=10000&type=rest_stop&key=${GOOGLE_MAPS_API_KEY}`
+              );
+              const placesData = await placesResponse.json();
+              return placesData.results.map(place => ({
+                name: place.name,
+                location: place.geometry.location,
+              }));
+            } catch (error) {
+              console.error('Error fetching places:', error);
+              return [];
+            }
+          })
+        );
+  
+        return restStops.flat();
+      }
+    } catch (error) {
+      console.error('Error fetching directions:', error);
+      return [];
+    }
+  };
 const Map = () => {
     //pull information from the data layer
     const origin = useSelector(selectOrigin)
@@ -16,6 +58,12 @@ const Map = () => {
         if (!origin || !destination || !mapRef.current) {
             return;
         }
+        const origin = {
+            location: {
+              lat: origin.location.lat,
+              lng: origin.location.lng
+            }
+          };
         // This will zoom out the map to make sure all markers are visible
         mapRef.current.fitToCoordinates( [{ latitude: origin.location.lat, longitude: origin.location.lng }, 
             { latitude: destination.location.lat, longitude: destination.location.lng }] , { 

@@ -2,35 +2,33 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, Dimensions } from 'react-native';
 import { PieChart, LineChart } from 'react-native-chart-kit';
 import axios from 'axios';
-// import { Audio } from 'expo-av';
-
+import * as Notifications from 'expo-notifications';
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
+async function registerForPushNotificationsAsync() {
+  const { status } = await Notifications.requestPermissionsAsync();
+  if (status !== 'granted') {
+    alert('Sorry, we need notification permissions to make this work!');
+    return;
+  }
+  // ...
+}
 
-
-// useEffect(() => {
-//   loadSound();
-//   return sound
-//     ? () => {
-//         sound.unloadAsync();
-//       }
-//     : undefined;
-// }, []);
-
-// async function loadSound() {
-//   const { sound } = await Audio.Sound.createAsync(
-//     require('C:\Users\downt\Documents\GitHub\dddas_ceg4912-4913\native-react-project-dddas\alarm.mp3')
-//   );
-//   setSound(sound);
-// }
-// async function playSound() {
-//   if (sound) {
-//     await sound.setVolumeAsync(0.2); // Maximum volume
-//     await sound.playAsync();
-//   }
-// }
+async function scheduleRepeatingNotification() {
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: "Test123",
+      body: 'This is a test notification.',
+    },
+    trigger: {
+      seconds: 15, // 120 seconds = 2 minutes
+      repeats: false
+    },
+  });
+}
 
 const AnalyticsScreen = () => {
+
   // State for Line Chart
   const [data, setData] = useState([0]);
 
@@ -42,21 +40,18 @@ const AnalyticsScreen = () => {
   ]);
 
   useEffect(() => {
+    registerForPushNotificationsAsync();
     const interval = setInterval(() => {
       axios.get(`http://100.72.37.45:5000/webhook`).then((response) => {
         console.log(response.data);
+        //scheduleRepeatingNotification();
         const newValue = response.data.heartrate
         setData(currentData => [...currentData, newValue].slice(-11));
         const newData = [...pieChartData];
         newData[response.data.results].population += 1;
         setPieChartData(newData);
       });
-      //playSound();
-      
-      // const randomChoice = Math.floor(Math.random() * 3);
-      // const newData = [...pieChartData];
-      // newData[randomChoice].population += 1;
-      // setPieChartData(newData);
+
     }, 1000); // Update interval for both charts
 
     return () => clearInterval(interval);
