@@ -57,7 +57,7 @@ const Map = () => {
                 waypoints={[waypoint.description]}
                 apikey= {GOOGLE_MAPS_APIKEY}
                 strokeWidth={3}
-                strokeColor='black'
+                strokeColor='hotpink'
             />
         )}
         {origin?.location && (

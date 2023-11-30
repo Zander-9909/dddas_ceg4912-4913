@@ -73,7 +73,7 @@ const AnalyticsScreen = () => {
         }
       });
 
-    }, 10000); // Update interval for both charts
+    }, 3000); // Update interval for both charts
 
     return () => {
       //sound && sound.unloadAsync();
