@@ -1,60 +1,27 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View} from 'react-native'
 import React, { useEffect, useRef } from 'react'
 import tw from 'tailwind-react-native-classnames';
 import MapView, {Marker} from 'react-native-maps';
 import { useSelector } from 'react-redux';
-import { selectDestination, selectOrigin } from '../slices/navSlice';
+import { selectDestination, selectOrigin , selectWaypoint} from '../slices/navSlice';
 import MapViewDirections from 'react-native-maps-directions';
 import { GOOGLE_MAPS_APIKEY } from "@env";
 
-const fetchRestStopsAlongRoute = async (origin, destination) => {
-    try {
-      const directionResponse = await fetch(
-        `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}&key=${GOOGLE_MAPS_API_KEY}`
-      );
-      const directionData = await directionResponse.json();
-  
-      if (directionData.routes.length > 0) {
-        const route = directionData.routes[0];
-        const waypoints = route.legs[0].steps
-          .filter(step => step.travel_mode === 'DRIVING')
-          .map(step => ({
-            latitude: step.end_location.lat,
-            longitude: step.end_location.lng,
-          }));
-  
-        const restStops = await Promise.all(
-          waypoints.map(async waypoint => {
-            try {
-              const placesResponse = await fetch(
-                `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${waypoint.latitude},${waypoint.longitude}&radius=10000&type=rest_stop&key=${GOOGLE_MAPS_API_KEY}`
-              );
-              const placesData = await placesResponse.json();
-              return placesData.results.map(place => ({
-                name: place.name,
-                location: place.geometry.location,
-              }));
-            } catch (error) {
-              console.error('Error fetching places:', error);
-              return [];
-            }
-          })
-        );
-  
-        return restStops.flat();
-      }
-    } catch (error) {
-      console.error('Error fetching directions:', error);
-      return [];
-    }
-  };
 const Map = () => {
     //pull information from the data layer
     const origin = useSelector(selectOrigin)
     const destination = useSelector(selectDestination)
+    const waypoint = useSelector(selectWaypoint)
     const mapRef = useRef(null);
-    //updates when orgin or destination is changed
+
+    /* Notes on waypoints
+    it is impossible to have a placeholder then add a waypoint after routing
+    the route MUST be drawn when all location are ready
+    */
+
+    //updates map based on changes in markers and added routes
     useEffect(() => {
+        //checks origin and dest change
         if (!origin || !destination || !mapRef.current) {
             return;
         }
@@ -69,7 +36,7 @@ const Map = () => {
             { latitude: destination.location.lat, longitude: destination.location.lng }] , { 
             edgePadding: { top: 50, right: 50, bottom: 50, left: 50 }, animated: true,
         });
-    }, [origin, destination]);
+    }, [origin, destination, waypoint]);
 
   return (
     <MapView
@@ -83,13 +50,14 @@ const Map = () => {
             longitudeDelta: 0.05,
         }}
     >
-        {origin && destination &&(
+        {origin && destination && waypoint &&(
             <MapViewDirections
                 origin={origin.description}
                 destination={destination.description}
+                waypoints={[waypoint.description]}
                 apikey= {GOOGLE_MAPS_APIKEY}
                 strokeWidth={3}
-                strokeColor='black' 
+                strokeColor='black'
             />
         )}
         {origin?.location && (
@@ -112,6 +80,17 @@ const Map = () => {
                 title ="destination"
                 description={destination.description}
                 identifier='destination'
+            />
+        )}
+        {waypoint?.location && (
+            <Marker
+                coordinate={{
+                    latitude: waypoint.location.lat,
+                    longitude: waypoint.location.lng,
+                }}
+                title ="waypoint"
+                description={waypoint.description}
+                identifier='waypoint'
             />
         )}
     </MapView>
