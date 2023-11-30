@@ -25,6 +25,12 @@ const Map = () => {
         if (!origin || !destination || !mapRef.current) {
             return;
         }
+        const origin = {
+            location: {
+              lat: origin.location.lat,
+              lng: origin.location.lng
+            }
+          };
         // This will zoom out the map to make sure all markers are visible
         mapRef.current.fitToCoordinates( [{ latitude: origin.location.lat, longitude: origin.location.lng }, 
             { latitude: destination.location.lat, longitude: destination.location.lng }] , { 

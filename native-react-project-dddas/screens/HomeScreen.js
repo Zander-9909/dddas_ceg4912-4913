@@ -7,7 +7,6 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 import { GOOGLE_MAPS_APIKEY } from "@env";
 import { useDispatch } from "react-redux";
 import { setOrigin, setDestination } from "../slices/navSlice";
-import axios from 'axios';
 const HomeScreen = () => {
     const dispatch = useDispatch();
 
@@ -42,12 +41,6 @@ const HomeScreen = () => {
                             })
                         );
                         dispatch(setDestination(null))
-                        const baseUrl = 'http://100.72.37.45:5000';
-
-                        // Invoking the get method to perform a GET request
-                        axios.get(`${baseUrl}/webhook`).then((response) => {
-                        console.log(response.data);
-                    });
                     }}
                     fetchDetails = {true}
                     returnKeyType = {"search"}

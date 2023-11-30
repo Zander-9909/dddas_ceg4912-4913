@@ -2,61 +2,56 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, Dimensions } from 'react-native';
 import { PieChart, LineChart } from 'react-native-chart-kit';
 import axios from 'axios';
-// import { Audio } from 'expo-av';
-
+import * as Notifications from 'expo-notifications';
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
+async function registerForPushNotificationsAsync() {
+  const { status } = await Notifications.requestPermissionsAsync();
+  if (status !== 'granted') {
+    alert('Sorry, we need notification permissions to make this work!');
+    return;
+  }
+  // ...
+}
 
-
-// useEffect(() => {
-//   loadSound();
-//   return sound
-//     ? () => {
-//         sound.unloadAsync();
-//       }
-//     : undefined;
-// }, []);
-
-// async function loadSound() {
-//   const { sound } = await Audio.Sound.createAsync(
-//     require('C:\Users\downt\Documents\GitHub\dddas_ceg4912-4913\native-react-project-dddas\alarm.mp3')
-//   );
-//   setSound(sound);
-// }
-// async function playSound() {
-//   if (sound) {
-//     await sound.setVolumeAsync(0.2); // Maximum volume
-//     await sound.playAsync();
-//   }
-// }
+async function scheduleRepeatingNotification() {
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: "Test123",
+      body: 'This is a test notification.',
+    },
+    trigger: {
+      seconds: 15, // 120 seconds = 2 minutes
+      repeats: false
+    },
+  });
+}
 
 const AnalyticsScreen = () => {
+
   // State for Line Chart
-  const [data, setData] = useState([0]);
+  const [data, setData] = useState([0,5,6,7]);
 
   // State for Pie Chart
   const [pieChartData, setPieChartData] = useState([
-    { name: 'Not Drowsy', population: 0, color: 'green', legendFontColor: '#7F7F7F', legendFontSize: 15 },
-    { name: 'Slightly Drowsy', population: 0, color: 'yellow', legendFontColor: '#7F7F7F', legendFontSize: 15 },
-    { name: 'Drowsy', population: 0, color: 'red', legendFontColor: '#7F7F7F', legendFontSize: 15 },
+    { name: 'Not Drowsy', population: 5, color: '#000000', legendFontColor: '#7F7F7F', legendFontSize: 15 },
+    { name: 'Slightly Drowsy', population: 6, color: '#4a1782', legendFontColor: '#7F7F7F', legendFontSize: 15 },
+    { name: 'Drowsy', population: 8, color: '#9f80d1', legendFontColor: '#7F7F7F', legendFontSize: 15 },
   ]);
 
   useEffect(() => {
+    registerForPushNotificationsAsync();
     const interval = setInterval(() => {
       axios.get(`http://100.72.37.45:5000/webhook`).then((response) => {
         console.log(response.data);
+        //scheduleRepeatingNotification();
         const newValue = response.data.heartrate
         setData(currentData => [...currentData, newValue].slice(-11));
         const newData = [...pieChartData];
         newData[response.data.results].population += 1;
         setPieChartData(newData);
       });
-      //playSound();
-      
-      // const randomChoice = Math.floor(Math.random() * 3);
-      // const newData = [...pieChartData];
-      // newData[randomChoice].population += 1;
-      // setPieChartData(newData);
+
     }, 1000); // Update interval for both charts
 
     return () => clearInterval(interval);
@@ -75,12 +70,13 @@ const AnalyticsScreen = () => {
     decimalPlaces: 2,
     color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
     style: { borderRadius: 16 },
+    labelColor: (opacity = 0) => `rgba(0, 0, 0, ${opacity})`, // This will make the labels transparent
   };
 
   const lineChartConfig = {
-    backgroundColor: '#e26a00',
-    backgroundGradientFrom: '#fb8c00',
-    backgroundGradientTo: '#ffa726',
+    backgroundColor: '#000080',
+    backgroundGradientFrom: '#000080',
+    backgroundGradientTo: '#000080',
     decimalPlaces: 2,
     color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
     style: { borderRadius: 16 },
@@ -98,7 +94,7 @@ const AnalyticsScreen = () => {
         backgroundColor={'transparent'}
         paddingLeft={'15'}
         center={[10, 10]}
-        absolute
+        absolute={false}
       />
 
       <LineChart
