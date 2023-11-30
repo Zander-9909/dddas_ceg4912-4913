@@ -1,3 +1,4 @@
+import random
 from flask import Flask,request
 from flask import jsonify
 from datetime import datetime
@@ -17,11 +18,14 @@ app = Flask(__name__)
 counter = 0
 first20 = False
 featuresRAW = []
+alertNotification = False
 mean = 0
 std = 0
 
+alertsResults = Queue(maxsize=5)
 detectionResults = Queue(maxsize=10)
 heartRates = Queue(maxsize=10)
+lastHR = 0
 
 avMAR = []
 avMOE = []
@@ -33,6 +37,11 @@ endTime = ""
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000)
 
+def most_common(lst):
+    if(len(lst)==0):
+        return 0
+    return max(set(lst), key=lst.count)
+
 @app.route("/")
 def hello_world():
     return "<p>Hello, World!</p>"
@@ -40,11 +49,12 @@ def hello_world():
 @app.route('/webhook', methods=['GET'])
 def webhook():
     if request.method == 'GET':
-        global detectionResults,heartRates
-        print("'GET' webhook received")
+        global detectionResults,lastHR,alertNotification,alertsResults
+
         dictR = {
-        'results': list(detectionResults.queue),
-        'heartrates': list(heartRates.queue)
+        'results': most_common(list(detectionResults.queue)),
+        'heartrate': lastHR,
+        'alert':bool(most_common(list(alertsResults.queue)))
         }
         returnVal = jsonify(dictR)
         returnVal.status_code = 200
@@ -53,6 +63,7 @@ def webhook():
 
 @app.route('/data', methods=['POST'])
 def process_json():
+    global lastHR
     content_type = request.headers.get('Content-Type')
     if (content_type == 'application/json'):
         json = dict(request.json)
@@ -74,10 +85,18 @@ def process_json():
                 avgMeasurements = y.mean(axis=0)
 
                 dictR = {"MOE":avgMeasurements.get("MOE"),"EAR":avgMeasurements.get("EAR"),"MAR":avgMeasurements.get("MAR"),"CIR":avgMeasurements.get("Circularity")}
-                rString,rProb = modelKNNWebServer(dictR, mean, std)
+                rString,rProb,iResult = modelKNNWebServer(dictR, mean, std)
                 result.update({"mess":rString})
                 result.update({"prob":str(rProb)})
-                print(dictR)
+
+                if not detectionResults.full():
+                    detectionResults.put(iResult)
+                else:
+                    detectionResults.get()
+                    detectionResults.put(iResult)
+                #print(dictR)
+                print("Detection Result: "+rString)
+                print("Probabilities: "+str(rProb))
                 featuresRAW = []
             elif counter%21 == 0 and not first20:#server has received the first 20 packets
                 endTime = json.get("time")
@@ -91,27 +110,40 @@ def process_json():
                 std = y.std(axis=0)
 
                 dictR = {"MOE":mean.get("MOE"),"EAR":mean.get("EAR"),"MAR":mean.get("MAR"),"CIR":mean.get("Circularity")}
-                rString,rProb = modelKNNWebServer(dictR, mean, std)
+                rString,rProb,RESULTTOUSE = modelKNNWebServer(dictR, mean, std)
                 result.update({"mess":rString})
                 result.update({"prob":str(rProb)})
+                print(rProb)
 
-                detectionResults.put(rString)
+                detectionResults.put(RESULTTOUSE)
                 
                 featuresRAW = []
             return result 
         elif (json.get("type")=="bpm"):
-            print(json)
+            lastHR = json.get("heartrate")
             if not heartRates.full():
                 heartRates.put(json.get("heartrate"))
             else:
                 heartRates.get()
                 heartRates.put(json.get("heartrate"))
-            dictR = {
-            'rumble':False
-            }
             
-            if((sum(list(heartRates.queue)) / len(list(heartRates.queue))) <=70): #or str(max(set(list(detectionResults)), key=list(detectionResults).count()))=="Drowsy"
-                dictR.update({'rumble':True})
+            avgHR = sum(list(heartRates.queue)) / len(list(heartRates.queue))
+            
+            if(avgHR <=70 and avgHR !=0) or (most_common(list(detectionResults.queue)))!=0 : 
+                alertNotification = True # Set Alert Signal
+            else:
+                alertNotification = False # Reset Alert Signal
+
+            if not alertsResults.full():
+                alertsResults.put(alertNotification)
+            else:
+                alertsResults.get()
+                alertsResults.put(alertNotification)
+            
+
+            dictR = {
+            'rumble':bool(most_common(list(alertsResults.queue)))
+            }
             returnVal = jsonify(dictR)
             returnVal.status_code = 200
             return returnVal

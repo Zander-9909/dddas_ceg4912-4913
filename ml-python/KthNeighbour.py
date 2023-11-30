@@ -118,7 +118,7 @@ def modelKNNWebServer(json,mean,std):
     df["Circularity_N"] = (df["Circularity"] - mean["Circularity"]) / std["Circularity"]
     df["MOE_N"] = (df["MOE"] - mean["MOE"]) / std["MOE"]
     
-    Result = neigh.predict(df)
+    Result = int(neigh.predict(df))
     prob = neigh.predict_proba(df)
     if Result == 2:
         Result_String = "Drowsy"
@@ -126,4 +126,4 @@ def modelKNNWebServer(json,mean,std):
         Result_String = "Slightly Drowsy"
     else:
         Result_String = "Not Drowsy"
-    return Result_String,prob
+    return Result_String,prob,Result
