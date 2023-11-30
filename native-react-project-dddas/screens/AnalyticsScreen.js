@@ -30,13 +30,13 @@ async function scheduleRepeatingNotification() {
 const AnalyticsScreen = () => {
 
   // State for Line Chart
-  const [data, setData] = useState([0]);
+  const [data, setData] = useState([0,5,6,7]);
 
   // State for Pie Chart
   const [pieChartData, setPieChartData] = useState([
-    { name: 'Not Drowsy', population: 0, color: 'green', legendFontColor: '#7F7F7F', legendFontSize: 15 },
-    { name: 'Slightly Drowsy', population: 0, color: 'yellow', legendFontColor: '#7F7F7F', legendFontSize: 15 },
-    { name: 'Drowsy', population: 0, color: 'red', legendFontColor: '#7F7F7F', legendFontSize: 15 },
+    { name: 'Not Drowsy', population: 5, color: '#000000', legendFontColor: '#7F7F7F', legendFontSize: 15 },
+    { name: 'Slightly Drowsy', population: 6, color: '#4a1782', legendFontColor: '#7F7F7F', legendFontSize: 15 },
+    { name: 'Drowsy', population: 8, color: '#9f80d1', legendFontColor: '#7F7F7F', legendFontSize: 15 },
   ]);
 
   useEffect(() => {
@@ -70,12 +70,13 @@ const AnalyticsScreen = () => {
     decimalPlaces: 2,
     color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
     style: { borderRadius: 16 },
+    labelColor: (opacity = 0) => `rgba(0, 0, 0, ${opacity})`, // This will make the labels transparent
   };
 
   const lineChartConfig = {
-    backgroundColor: '#e26a00',
-    backgroundGradientFrom: '#fb8c00',
-    backgroundGradientTo: '#ffa726',
+    backgroundColor: '#000080',
+    backgroundGradientFrom: '#000080',
+    backgroundGradientTo: '#000080',
     decimalPlaces: 2,
     color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
     style: { borderRadius: 16 },
@@ -93,7 +94,7 @@ const AnalyticsScreen = () => {
         backgroundColor={'transparent'}
         paddingLeft={'15'}
         center={[10, 10]}
-        absolute
+        absolute={false}
       />
 
       <LineChart
