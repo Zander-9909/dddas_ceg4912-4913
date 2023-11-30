@@ -24,8 +24,8 @@ function App() {
           <Stack.Navigator>
 
             {/* Screens from the first snippet */}
-            <Stack.Screen name='Signin' component={SigninScreen} options={{ headerShown: false }} />
-            <Stack.Screen name='Register' component={RegisterScreen} />
+            <Stack.Screen name='SigninScreen' component={SigninScreen} options={{ headerShown: false }} />
+            <Stack.Screen name='RegisterScreen' component={RegisterScreen} />
             <Stack.Screen name='ForgotPassword' component={ForgotPasswordScreen} />
 
             {/* Screens from the second snippet */}

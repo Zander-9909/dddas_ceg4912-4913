@@ -3,8 +3,8 @@ import {
     StyleSheet, Text, View, TouchableWithoutFeedback, KeyboardAvoidingView, StatusBar,
     TextInput, Keyboard, Button, Image } from 'react-native';
 import Logo from 'C:/Users/downt/Documents/GitHub/dddas_ceg4912-4913/native-react-project-dddas/assets/Logo.png';
-
-const signinScreenName = 'Signin';
+import axios from 'axios';
+import SigninScreen from "./SigninScreen";
 
 function RegisterScreen(props) {
     const { navigation } = props;
@@ -13,6 +13,32 @@ function RegisterScreen(props) {
     const [username, onChangeUsername] = React.useState('');
     const [email, onChangeEmail] = React.useState('');
     const [password, onChangePassword] = React.useState('');
+
+    const handleRegister = async (username, firstName, lastName, email, password) => {
+        const session_url = 'http://192.168.43.191:5000/users/add';
+
+        axios.post(session_url, {
+            "username": username,
+            "firstName": firstName,
+            "lastName": lastName,
+            "email": email,
+            "password": password
+        })
+            .then(response => {
+                if (response.status === 200) { // register successful
+                    navigation.navigate(SigninScreen);
+                    onChangeFirstName('');
+                    onChangeLastName('');
+                    onChangeUsername('');
+                    onChangeEmail('');
+                    onChangePassword('');
+                    console.log(`User has been registered.`);
+                }
+            })
+            .catch(error => {
+                console.log('Error', error.message);
+            });
+    };
 
     return (
         <KeyboardAvoidingView
@@ -93,7 +119,7 @@ function RegisterScreen(props) {
                         />
                         <Button
                             color='blue'
-                            onPress={() => navigation.navigate(signinScreenName)}
+                            onPress={() => handleRegister(username, firstName, lastName, email, password)}
                             title='CREATE NEW ACCOUNT'
                         />
                     </View>

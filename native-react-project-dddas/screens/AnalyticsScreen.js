@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, Dimensions } from 'react-native';
+import { StyleSheet, View, Text, Dimensions, LogBox } from 'react-native';
 import { PieChart, LineChart } from 'react-native-chart-kit';
 import axios from 'axios';
 import * as Notifications from 'expo-notifications';
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
+import { Audio } from 'expo-av';
+
 async function registerForPushNotificationsAsync() {
   const { status } = await Notifications.requestPermissionsAsync();
   if (status !== 'granted') {
@@ -13,12 +15,12 @@ async function registerForPushNotificationsAsync() {
   }
   // ...
 }
-
+LogBox.ignoreAllLogs();
 async function scheduleRepeatingNotification() {
   await Notifications.scheduleNotificationAsync({
     content: {
-      title: "Test123",
-      body: 'This is a test notification.',
+      title: "Drowsiness Alert",
+      body: 'You may feel drowsy, pull over soon!',
     },
     trigger: {
       seconds: 15, // 120 seconds = 2 minutes
@@ -28,19 +30,32 @@ async function scheduleRepeatingNotification() {
 }
 
 const AnalyticsScreen = () => {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: true,
+    }),
+  });
+  async function loadSound() {
+    const { sound } = await Audio.Sound.createAsync(
+        require('C:/Users/downt/Documents/GitHub/dddas_ceg4912-4913/native-react-project-dddas/alarm.mp3')
+    );
+    setSound(sound);
+  }
+  const [sound, setSound] = useState();
 
   // State for Line Chart
   const [data, setData] = useState([0,5,6,7]);
 
   // State for Pie Chart
   const [pieChartData, setPieChartData] = useState([
-    { name: 'Not Drowsy', population: 5, color: '#000000', legendFontColor: '#7F7F7F', legendFontSize: 15 },
-    { name: 'Slightly Drowsy', population: 6, color: '#4a1782', legendFontColor: '#7F7F7F', legendFontSize: 15 },
-    { name: 'Drowsy', population: 8, color: '#9f80d1', legendFontColor: '#7F7F7F', legendFontSize: 15 },
+    { name: 'Not Drowsy', population: 0, color: '#000000', legendFontColor: '#7F7F7F', legendFontSize: 15 },
+    { name: 'Slightly Drowsy', population: 0, color: '#4a1782', legendFontColor: '#7F7F7F', legendFontSize: 15 },
+    { name: 'Drowsy', population: 0, color: '#9f80d1', legendFontColor: '#7F7F7F', legendFontSize: 15 },
   ]);
-
   useEffect(() => {
-    registerForPushNotificationsAsync();
+    loadSound();
     const interval = setInterval(() => {
       axios.get(`http://100.72.37.45:5000/webhook`).then((response) => {
         console.log(response.data);
@@ -50,12 +65,21 @@ const AnalyticsScreen = () => {
         const newData = [...pieChartData];
         newData[response.data.results].population += 1;
         setPieChartData(newData);
+        if (response.data.alert == true){
+          registerForPushNotificationsAsync();
+          scheduleRepeatingNotification();
+          //console.log("printing")
+          sound && sound.playAsync();
+        }
       });
 
-    }, 1000); // Update interval for both charts
+    }, 10000); // Update interval for both charts
 
-    return () => clearInterval(interval);
-  }, [pieChartData]);
+    return () => {
+      //sound && sound.unloadAsync();
+      clearInterval(interval);
+  };
+}, [pieChartData]);
   //[pieChartData, sound]);
 
   const lineChartData = {
