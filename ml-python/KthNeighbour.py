@@ -1,3 +1,4 @@
+import random
 import dlib
 import cv2
 from imutils import face_utils
@@ -20,9 +21,9 @@ def average(y_pred):
       pass
     else: 
       average = float(y_pred[i-1] +  y_pred[i] + y_pred[i+1])/3
-      if average >= 1.3:
+      if average >= 1.2:
         y_pred[i] = 2
-      elif average >= 0.7:
+      elif average >= 0.5:
          y_pred[i] = 1
       else:
         y_pred[i] = 0
@@ -66,7 +67,7 @@ roc_3_list = []
 neigh = KNeighborsClassifier(n_neighbors=acc3_list.index(max(acc3_list))+1)'''
 
 # 40 was the highest
-neigh = KNeighborsClassifier(40)
+neigh = KNeighborsClassifier(44)
 print(f"Neighbors: {neigh.get_params()['n_neighbors']}")
 neigh.fit(X_train, y_train) 
 
@@ -120,6 +121,14 @@ def modelKNNWebServer(json,mean,std):
     
     Result = int(neigh.predict(df))
     prob = neigh.predict_proba(df)
+
+    drowsyAtAll = prob[0][1]+prob[0][2]
+    print(drowsyAtAll)
+    if(drowsyAtAll >=0.2):
+       Result = random.choice([1,2])
+    else:
+       Result = 0
+
     if Result == 2:
         Result_String = "Drowsy"
     elif Result == 1:

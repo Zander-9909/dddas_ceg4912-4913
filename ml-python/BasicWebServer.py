@@ -1,4 +1,5 @@
 import random
+from statistics import mode
 from flask import Flask,request
 from flask import jsonify
 from datetime import datetime
@@ -15,6 +16,11 @@ app = Flask(__name__)
 # flask --app BasicWebServer run --host=100.72.37.45   #
 #                                                      #
 ########################################################
+
+import logging
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
+
 counter = 0
 first20 = False
 featuresRAW = []
@@ -22,9 +28,10 @@ alertNotification = False
 mean = 0
 std = 0
 
-alertsResults = Queue(maxsize=5)
-detectionResults = Queue(maxsize=10)
-heartRates = Queue(maxsize=10)
+alertsResults = Queue(maxsize=3)
+detectionResults = Queue(maxsize=3)
+heartRates = Queue(maxsize=5)
+ultrasonic = 0
 lastHR = 0
 
 avMAR = []
@@ -42,6 +49,26 @@ def most_common(lst):
         return 0
     return max(set(lst), key=lst.count)
 
+def checkAlert():
+    global avMAR,avMOE,counter,avCIR,avEAR,startTime,endTime,mean,first20,std,featuresRAW,detectionResults,alertsResults
+
+    if(len(list(heartRates.queue)) > 0):
+        avgHR = sum(list(heartRates.queue)) / len(list(heartRates.queue))
+    else:
+        avgHR = 0
+    
+
+    if(avgHR <=70 and avgHR !=0) or (most_common(list(detectionResults.queue)))>0 or (ultrasonic <= 5 and ultrasonic !=0): 
+        alertNotification = True # Set Alert Signal
+    else:
+        alertNotification = False # Reset Alert Signal
+
+    if not alertsResults.full():
+        alertsResults.put(alertNotification)
+    else:
+        alertsResults.get()
+        alertsResults.put(alertNotification)
+
 @app.route("/")
 def hello_world():
     return "<p>Hello, World!</p>"
@@ -49,7 +76,9 @@ def hello_world():
 @app.route('/webhook', methods=['GET'])
 def webhook():
     if request.method == 'GET':
-        global detectionResults,lastHR,alertNotification,alertsResults
+        global detectionResults,lastHR,alertsResults
+        checkAlert()
+        print(list(alertsResults.queue))
 
         dictR = {
         'results': most_common(list(detectionResults.queue)),
@@ -68,7 +97,7 @@ def process_json():
     if (content_type == 'application/json'):
         json = dict(request.json)
         if(json.get("type")=="facial"):
-            global avMAR,avMOE,counter,avCIR,avEAR,startTime,endTime,mean,first20,std,featuresRAW,detectionResults
+            global avMAR,avMOE,counter,avCIR,avEAR,startTime,endTime,mean,first20,std,featuresRAW,detectionResults,ultrasonic
 
             counter = counter + 1 
             result = {"mess":"****Received packet****"}
@@ -115,9 +144,15 @@ def process_json():
                 result.update({"prob":str(rProb)})
                 print(rProb)
 
-                detectionResults.put(RESULTTOUSE)
+                if not detectionResults.full():
+                    detectionResults.put(RESULTTOUSE)
+                else:
+                    detectionResults.get()
+                    detectionResults.put(RESULTTOUSE)
+                
                 
                 featuresRAW = []
+            
             return result 
         elif (json.get("type")=="bpm"):
             lastHR = json.get("heartrate")
@@ -126,20 +161,7 @@ def process_json():
             else:
                 heartRates.get()
                 heartRates.put(json.get("heartrate"))
-            
-            avgHR = sum(list(heartRates.queue)) / len(list(heartRates.queue))
-            
-            if(avgHR <=70 and avgHR !=0) or (most_common(list(detectionResults.queue)))!=0 : 
-                alertNotification = True # Set Alert Signal
-            else:
-                alertNotification = False # Reset Alert Signal
-
-            if not alertsResults.full():
-                alertsResults.put(alertNotification)
-            else:
-                alertsResults.get()
-                alertsResults.put(alertNotification)
-            
+            ultrasonic = json.get("ultrasonic")
 
             dictR = {
             'rumble':bool(most_common(list(alertsResults.queue)))
